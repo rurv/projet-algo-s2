@@ -11,4 +11,4 @@ add_executable(projet_algo_s2
         .idea/workspace.xml
         .gitignore
         README.md
-        main.c)
+        src/main.c)
