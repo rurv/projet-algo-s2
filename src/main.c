@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 int main() {
-    printf("Bonjour");
+    printf("c la grosse merde je comprend rien a l'elec.");
 
     return 0;
 }
