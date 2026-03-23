@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <allegro.h>
+
 void initialisation_allegro();
 int main(int argc, char *argv[])
 {
