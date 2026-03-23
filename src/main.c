@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     srand(time(NULL));
     initialisation_allegro();
     allegro_message("Cliquer sur ok pour continuer\n Il faudra appuyer sur une touche pour quitter le programme");
-    circlefill(screen,SCREEN_W/2,SCREEN_H/2,100,makecol(255,0,0));
+    rectfill(screen,SCREEN_W/2,SCREEN_H/2,100,100,makecol(rand() % 256,rand() % 256,rand() % 256));
     readkey();
     allegro_exit();
     return 0;
