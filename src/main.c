@@ -8,6 +8,7 @@
 #include <allegro.h>
 
 void initialisation_allegro();
+
 int main(int argc, char *argv[])
 {
     int i;
