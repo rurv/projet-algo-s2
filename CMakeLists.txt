@@ -10,6 +10,14 @@ add_executable(projet_algo_s2
         src/display.c
         headers/display.h
         src/game.c
-        headers/game.h)
+        headers/game.h
+        src/audio.c
+        headers/audio.h
+        src/assets.c
+        headers/assets.h
+        src/player.c
+        headers/player.h
+        src/asteroids.c
+        headers/asteroids.h)
 
 target_link_libraries(projet_algo_s2 -lmingw32 -lalleg44)
