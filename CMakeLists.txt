@@ -4,6 +4,12 @@ project(projet_algo_s2 C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(projet_algo_s2
-        src/main.c)
+        src/main.c
+        src/ihm.c
+        headers/ihm.h
+        src/display.c
+        headers/display.h
+        src/game.c
+        headers/game.h)
 
 target_link_libraries(projet_algo_s2 -lmingw32 -lalleg44)

@@ -11,57 +11,69 @@ void initialisation_allegro();
 
 int main() {
     initialisation_allegro();
+
     BITMAP *buffer = create_bitmap(SCREEN_W,SCREEN_H);
-    BITMAP *perso = create_bitmap(101, 101);
-    BITMAP *decor = create_bitmap(SCREEN_W,SCREEN_H);
-    BITMAP *sol = create_bitmap(SCREEN_W, SCREEN_H/2);
-    BITMAP *trampoline = create_bitmap(150, 30);
-    float x = SCREEN_W/2 - 50, y = SCREEN_H/2 - 101;
-    float g = 0;
-    int depx = 3;
-    srand(time(NULL));
-    while (!key[KEY_ESC]) {
-        y += g;
-        if (y >= 2*SCREEN_H/3 - 101) {
-            y = 2*SCREEN_H/3 - 101;
-            g = 0.0;
-        } else {
-            g += 0.3;
-        }
-
-        clear_bitmap(buffer);
-        clear_to_color(decor, makecol(153, 204, 255));
-        rectfill(sol, 0, 0, SCREEN_W, SCREEN_H/2, makecol(76, 153, 0));
-        blit(sol, decor, 0, 0, 0, 2*SCREEN_H/3, SCREEN_W, SCREEN_H/2);
-        rectfill(trampoline, 0, 0, 150, 30, makecol(255, 128, 0));
-        blit(trampoline, decor, 0, 0, 3*SCREEN_W/4, 2*SCREEN_H/3, 150, 30);
-        blit(decor, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        clear_to_color(perso, makecol(255, 0, 255));
-        triangle(perso, 0, 101, 101, 101, 50, 0, makecol(255, 0, 0));
-        masked_blit(perso, buffer, 0, 0, (int)x, (int)y, 101, 101);
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
-        int au_sol = y >= 2*SCREEN_H/3 - 101;
-
-        if (getpixel(screen, x + 50, y + 102) == makecol(255, 128, 0)) g -= 20.0;
-
-        if (key[KEY_LEFT]) {
-            if (x - depx < -101) x = SCREEN_W;
-            else x -= depx;
-        }
-        if (key[KEY_RIGHT]) {
-            if (x + depx > SCREEN_W) x = -101;
-            else x += depx;
-        }
-        if (key[KEY_UP] && au_sol) {
-            g = -15.0;
+    BITMAP *fond = load_bitmap("fond1.bmp", NULL);
+    BITMAP *asteroid = create_bitmap(128, 128);
+    BITMAP *sprites_asteroid = load_bitmap("sprites_asteroid2.bmp", NULL);
+    if (!sprites_asteroid) {
+        allegro_message("probleme de chargement des asteorides");
+        allegro_exit();
+        return 0;
+    }
+    int mask = 180;
+    int blanc  = makecol(255, 255, 255);
+    int magenta = makecol(255, 0, 255);
+    for (int y = 0; y < sprites_asteroid->h; y++) {
+        for (int x = 0; x < sprites_asteroid->w; x++) {
+            if (getr(getpixel(sprites_asteroid, x, y)) > mask && getg(getpixel(sprites_asteroid, x, y)) > mask && getb(getpixel(sprites_asteroid, x, y)) > mask) {
+                putpixel(sprites_asteroid, x, y, magenta);
+            }
         }
     }
+    BITMAP *ship = create_bitmap(48, 64);
+    BITMAP *sprites_ship = load_bitmap("modular_ships.bmp", NULL);
+    if (!sprites_ship) {
+        allegro_message("probleme de chargement des vaisseaux");
+        allegro_exit();
+        return 0;
+    }
+    for (int y = 0; y < sprites_ship->h; y++) {
+        for (int x = 0; x < sprites_ship->w; x++) {
+            if (getr(getpixel(sprites_ship, x, y)) == 0 && getg(getpixel(sprites_ship, x, y)) == 128 && getb(getpixel(sprites_ship, x, y)) == 192) {
+                putpixel(sprites_ship, x, y, magenta);
+            }
+        }
+    }
+
+    srand(time(NULL));
+    int i = 0;
+    int rest_t = 0;
+    int mult = 3;
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer);
+
+
+        if (rest_t % 100 == 0) {
+            clear_to_color(asteroid, makecol(255, 0, 255));
+            blit(sprites_asteroid, asteroid, i*128, 0, 0, 0, 128, 128);
+            i += 1;
+            i %= 64;
+        }
+        masked_blit(asteroid, buffer, 0, 0, SCREEN_W/2, SCREEN_H/2, 128, 128);
+
+        blit(sprites_ship, ship, 208, 326, 0, 0, 48, 64);
+        masked_stretch_blit(ship, buffer, 0, 0, 48, 64, SCREEN_W/2 - 100, SCREEN_H/2, 96, 128);
+
+        blit(buffer,screen,0,0,0,0,SCREEN_W,SCREEN_H);
+        rest_t++;
+    }
+
     readkey();
-    destroy_bitmap(perso);
-    destroy_bitmap(sol);
-    destroy_bitmap(decor);
+
     destroy_bitmap(buffer);
+
     allegro_exit();
     return 0;
 } END_OF_MAIN();
@@ -71,7 +83,7 @@ void initialisation_allegro() {
     install_keyboard();
     install_mouse();
     set_color_depth(desktop_color_depth());
-    if(set_gfx_mode(GFX_AUTODETECT_WINDOWED,1500,900,0,0)!=0)
+    if(set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,1920,1080,0,0)!=0)
     {
         allegro_message("probleme mode graphique");
         allegro_exit();
