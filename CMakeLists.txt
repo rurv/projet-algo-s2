@@ -3,6 +3,8 @@ project(projet_algo_s2 C)
 
 set(CMAKE_C_STANDARD 11)
 
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
+
 add_executable(projet_algo_s2
         src/main.c
         src/ihm.c
