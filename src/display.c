@@ -3,7 +3,6 @@
 //
 
 #include "../headers/display.h"
-#include "../headers/assets.h"
 
 void initialisation_allegro() {
     allegro_init();
@@ -15,6 +14,7 @@ void initialisation_allegro() {
         allegro_exit();
         exit(EXIT_FAILURE);
     }
+    show_mouse(screen);
 }
 
 void init_display (BITMAP **buffer, Assets *assets) {
@@ -28,9 +28,15 @@ void init_display (BITMAP **buffer, Assets *assets) {
     load_assets(assets);
 }
 
-void display (BITMAP *buffer, Assets *assets) {
+BITMAP *player_sprite (Assets assets) {
+    BITMAP *player_sprite = create_bitmap(32, 32);
+    masked_blit(assets.player_sprites, player_sprite, 80, 320, 0, 0, player_sprite->w, player_sprite->h);
+    return player_sprite;
+}
+
+void display (BITMAP *buffer, Assets *assets, Player *player) {
     clear_bitmap(buffer);
-    masked_blit(assets->player_sprites, buffer, 0, 0, 0, 0, assets->player_sprites->w, assets->player_sprites->h);
+    draw_player(&buffer, *assets, *player);
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 

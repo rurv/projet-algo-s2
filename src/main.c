@@ -9,16 +9,25 @@
 
 #include "../headers/display.h"
 
-int main() {
+typedef struct Bitmaps {
     BITMAP *buffer;
+    BITMAP *ship;
+    BITMAP *fond;
+    BITMAP *asteroid;
+} Bitmaps;
+
+int main() {
+    Bitmaps bmps;
     Assets assets;
-    init_display(&buffer, &assets);
+    init_display(&bmps.buffer, &assets);
+    Player player = init_player();
+    bmps.ship = player_sprite(assets);
     srand(time(NULL));
     while (!key[KEY_ESC]) {
-        display(buffer, &assets);
+        display(bmps.buffer, &assets, &player);
     }
     readkey();
-    destroy_display(&buffer, &assets);
+    destroy_display(&bmps.buffer, &assets);
     allegro_exit();
     return 0;
 } END_OF_MAIN();
