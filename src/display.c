@@ -30,11 +30,28 @@ void init_display (BITMAP **buffer, Assets *assets) {
 
 void display (BITMAP *buffer, Assets *assets) {
     clear_bitmap(buffer);
-    masked_blit(assets->player_sprites, buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
+    masked_blit(assets->player_sprites, buffer, 152, 336, SCREEN_WIDTH/3+180, 650, 48, 64);
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 void destroy_display (BITMAP **buffer, Assets *assets) {
     free_assets(assets);
     destroy_bitmap(*buffer);
+}
+
+void update_display (BITMAP *buffer, Assets *assets, Player *player) {
+    clear_bitmap(buffer);
+
+    int sx = 152; // Coordonnée X dans .bmp
+    int sy = 336; // Coordonnée Y dans .bmp
+    int sw = 48;  // Largeur du sprite
+    int sh = 64;  // Hauteur du sprite
+
+    player->x += player->dx;
+
+    if (player->x < 0) player->x = 0;
+    if (player->x > SCREEN_W - sw) player->x = SCREEN_W - sw;
+
+    masked_blit(assets->player_sprites, buffer, sx, sy, player->x, 650, sw, sh);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
