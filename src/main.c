@@ -12,14 +12,14 @@
 int main() {
     Bitmaps bmps;
     Assets assets;
-    init_display(&bmps.buffer, &assets);
+    init_display(&bmps, &assets);
 
     srand(time(NULL));
     while (!key[KEY_ESC]) {
-        display(bmps.buffer, &assets);
+        display(&bmps, &assets);
     }
     readkey();
-    destroy_display(&bmps.buffer, &assets);
+    destroy_display(&bmps, &assets);
     allegro_exit();
     return 0;
 } END_OF_MAIN();
