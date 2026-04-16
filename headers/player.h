@@ -9,11 +9,16 @@
 #include "../headers/assets.h"
 
 typedef struct Player {
-    int x, y;
+    float x, y;
+    float dx, dy;
+    int pv;
+    int invincible;
     int skin_id;
 } Player;
 
-Player init_player (void);
-void draw_player (BITMAP **buffer, Assets assets, Player p);
+void player_update (Player **p);
+void player_update (Player *p);
+void player_draw (BITMAP *buffer, Player *p, Assets *a);
+void player_destroy (Player **p);
 
 #endif //PROJET_ALGO_S2_PLAYER_H
