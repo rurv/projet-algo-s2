@@ -20,6 +20,8 @@ add_executable(projet_algo_s2
         src/player.c
         headers/player.h
         src/asteroids.c
-        headers/asteroids.h)
+        headers/asteroids.h
+        src/config.c
+        headers/config.h)
 
 target_link_libraries(projet_algo_s2 -lmingw32 -lalleg44)
