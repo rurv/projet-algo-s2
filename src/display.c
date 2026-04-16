@@ -30,7 +30,7 @@ void init_display (BITMAP **buffer, Assets *assets) {
 
 void display (BITMAP *buffer, Assets *assets) {
     clear_bitmap(buffer);
-    masked_blit(assets->player_sprites, buffer, 0, 0, 0, 0, assets->player_sprites->w, assets->player_sprites->h);
+    masked_blit(assets->player_sprites, buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
