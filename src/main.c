@@ -20,11 +20,10 @@ int main() {
     Bitmaps bmps;
     Assets assets;
     init_display(&bmps.buffer, &assets);
-    Player player = init_player();
-    bmps.ship = player_sprite(assets);
+
     srand(time(NULL));
     while (!key[KEY_ESC]) {
-        display(bmps.buffer, &assets, &player);
+        display(bmps.buffer, &assets);
     }
     readkey();
     destroy_display(&bmps.buffer, &assets);

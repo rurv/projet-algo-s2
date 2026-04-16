@@ -14,7 +14,7 @@
 void initialisation_allegro();  // initialisation de allegro
 void init_display(BITMAP **buffer, Assets *assets);   // initialisation du buffer et des assets
 BITMAP *player_sprite (Assets assets);
-void display(BITMAP *buffer, Assets *assets, Player *player); // affichage
+void display(BITMAP *buffer, Assets *assets); // affichage
 void destroy_display(BITMAP **buffer, Assets *assets); // liberation du buffer
 
 #endif //PROJET_ALGO_S2_DISPLAY_H
