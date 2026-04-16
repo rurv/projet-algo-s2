@@ -9,13 +9,6 @@
 
 #include "../headers/display.h"
 
-typedef struct Bitmaps {
-    BITMAP *buffer;
-    BITMAP *ship;
-    BITMAP *fond;
-    BITMAP *asteroid;
-} Bitmaps;
-
 int main() {
     Bitmaps bmps;
     Assets assets;
