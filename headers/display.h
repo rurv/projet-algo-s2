@@ -7,6 +7,7 @@
 
 #include <allegro.h>
 
+#include "config.h"
 #include "assets.h"
 #include "player.h"
 
