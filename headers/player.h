@@ -16,7 +16,7 @@ typedef struct Player {
     int skin_id;
 } Player;
 
-void player_update (Player **p);
+void player_init (Player **p);
 void player_update (Player *p);
 void player_draw (BITMAP *buffer, Player *p, Assets *a);
 void player_destroy (Player **p);
