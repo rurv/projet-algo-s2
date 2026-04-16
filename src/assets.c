@@ -6,7 +6,7 @@
 
 void load_assets (Assets *a) {
     // a->... = load_bitmap("assets/images/... .bmp", NULL);
-    a->player_sprites = load_bitmap("../assets/images/sprites_ships.bmp", NULL);
+    a->player_sprites = load_bitmap("assets/images/sprites_ships.bmp", NULL);
 
     // if (!a->...) { ... }
     if (!a->player_sprites) {

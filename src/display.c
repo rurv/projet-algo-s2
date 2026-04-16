@@ -17,10 +17,10 @@ void initialisation_allegro() {
     show_mouse(screen);
 }
 
-void init_display (BITMAP **buffer, Assets *assets) {
+void init_display (Bitmaps *b, Assets *assets) {
     initialisation_allegro();
-    *buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    if (!*buffer) {
+    b->buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!b->buffer) {
         allegro_message("Erreur création buffer");
         allegro_exit();
         exit(1);
@@ -28,13 +28,13 @@ void init_display (BITMAP **buffer, Assets *assets) {
     load_assets(assets);
 }
 
-void display (BITMAP *buffer, Assets *assets) {
-    clear_bitmap(buffer);
-    masked_blit(assets->player_sprites, buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+void display (Bitmaps *b, Assets *assets) {
+    clear_bitmap(b->buffer);
+    masked_blit(assets->player_sprites, b->buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
+    blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
-void destroy_display (BITMAP **buffer, Assets *assets) {
+void destroy_display (Bitmaps *b, Assets *assets) {
     free_assets(assets);
-    destroy_bitmap(*buffer);
+    destroy_bitmap(b->buffer);
 }
