@@ -33,6 +33,7 @@ void init_display (Bitmaps *b, Assets *assets) {
     for (int i = 0; i < 200; i++) {
         blit(etoile, b->fond, 0, 0, rand() % b->fond->w, rand() % b->fond->h, etoile->w, etoile->h);
     }
+    destroy_bitmap(etoile);
 }
 
 void display (Bitmaps *b, Assets *assets) {
@@ -45,4 +46,7 @@ void display (Bitmaps *b, Assets *assets) {
 void destroy_display (Bitmaps *b, Assets *assets) {
     free_assets(assets);
     destroy_bitmap(b->buffer);
+    destroy_bitmap(b->fond);
+    destroy_bitmap(b->ship);
+    destroy_bitmap(b->asteroid);
 }
