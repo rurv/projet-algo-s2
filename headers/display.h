@@ -21,7 +21,7 @@ typedef struct Bitmaps {
 void initialisation_allegro();  // initialisation de allegro
 void init_display(Bitmaps *b, Assets *assets);   // initialisation du buffer et des assets
 BITMAP *player_sprite (Assets assets);
-void display(Bitmaps *b, Assets *assets); // affichage
+void display(Bitmaps *b, Assets *assets, Player p); // affichage
 void destroy_display(Bitmaps *b, Assets *assets); // liberation du buffer
 
 #endif //PROJET_ALGO_S2_DISPLAY_H

@@ -36,10 +36,10 @@ void init_display (Bitmaps *b, Assets *assets) {
     destroy_bitmap(etoile);
 }
 
-void display (Bitmaps *b, Assets *assets) {
+void display (Bitmaps *b, Assets *assets, Player p) {
     clear_bitmap(b->buffer);
     masked_blit(b->fond, b->buffer, 0, 0, 0, 0, b->fond->w, b->fond->h);
-    masked_blit(assets->player_sprites, b->buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
+    masked_blit(assets->player_sprites, b->buffer, 152, 336, p.x, p.y, 48, 64);
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 

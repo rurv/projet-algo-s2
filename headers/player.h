@@ -11,13 +11,17 @@
 typedef struct Player {
     float x, y;
     float dx, dy;
+    float ddx, ddy;
+    float vmax;
     int pv;
     int invincible;
     int skin_id;
 } Player;
 
-void player_init (Player **p);
+void player_init (Player *p);
 void player_update (Player *p);
+void player_move_left (Player *p);
+void player_move_right (Player *p);
 void player_draw (BITMAP *buffer, Player *p, Assets *a);
 void player_destroy (Player **p);
 
