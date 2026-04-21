@@ -5,4 +5,9 @@
 #ifndef PROJET_ALGO_S2_GAME_H
 #define PROJET_ALGO_S2_GAME_H
 
+#include <allegro.h>
+#include "player.h"
+
+void game_update (Player *player);
+
 #endif //PROJET_ALGO_S2_GAME_H

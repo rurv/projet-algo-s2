@@ -22,6 +22,8 @@ add_executable(projet_algo_s2
         src/asteroids.c
         headers/asteroids.h
         src/config.c
-        headers/config.h)
+        headers/config.h
+        src/save.c
+        headers/save.h)
 
 target_link_libraries(projet_algo_s2 -lmingw32 -lalleg44)

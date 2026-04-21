@@ -8,18 +8,22 @@
 #include <allegro.h>
 
 #include "../headers/display.h"
+#include "../headers/game.h"
 
 int main() {
     Bitmaps bmps;
     Assets assets;
-    init_display(&bmps.buffer, &assets);
+    init_display(&bmps, &assets);
+    Player player;
+    player_init(&player);
 
     srand(time(NULL));
     while (!key[KEY_ESC]) {
-        display(bmps.buffer, &assets);
+        game_update (&player);
+        display(&bmps, &assets, player);
     }
     readkey();
-    destroy_display(&bmps.buffer, &assets);
+    destroy_display(&bmps, &assets);
     allegro_exit();
     return 0;
 } END_OF_MAIN();

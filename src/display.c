@@ -26,17 +26,29 @@ void init_display (Bitmaps *b, Assets *assets) {
         exit(1);
     }
     load_assets(assets);
+    b->fond = create_bitmap(b->buffer->w,b->buffer->h);
+    clear_to_color(b->fond, makecol(255, 0, 255));
+    BITMAP *etoile = create_bitmap(2, 2);
+    clear_to_color(etoile, makecol(255, 255, 255));
+    for (int i = 0; i < 200; i++) {
+        blit(etoile, b->fond, 0, 0, rand() % b->fond->w, rand() % b->fond->h, etoile->w, etoile->h);
+    }
+    destroy_bitmap(etoile);
 }
 
-void display (Bitmaps *b, Assets *assets) {
+void display (Bitmaps *b, Assets *assets, Player p) {
     clear_bitmap(b->buffer);
-    masked_blit(assets->player_sprites, b->buffer, 152, 336, SCREEN_W/3+100, 425, 48, 64);
+    masked_blit(b->fond, b->buffer, 0, 0, 0, 0, b->fond->w, b->fond->h);
+    masked_blit(assets->player_sprites, b->buffer, 152, 336, p.x, p.y, 48, 64);
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 void destroy_display (Bitmaps *b, Assets *assets) {
     free_assets(assets);
     destroy_bitmap(b->buffer);
+    destroy_bitmap(b->fond);
+    destroy_bitmap(b->ship);
+    destroy_bitmap(b->asteroid);
 }
 
 void update_display (BITMAP *buffer, Assets *assets, Player *player) {
