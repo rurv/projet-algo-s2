@@ -11,12 +11,47 @@ void player_init (Player *p) {
     p->vmax = 5.0;
     p->pv = 10; p->invincible = 0;
     p->skin_id = 0;
+    p->lasers = malloc(MAX_LASERS * sizeof(Laser));
+    p->laser_count = MAX_LASERS;
+
+    for (int i = 0; i < MAX_LASERS; i++) {
+        p->lasers[i].active = 0;
+        p->lasers[i].frame = 0;
+        p->lasers[i].frame_timer = 0;
+    }
+}
+
+void player_shot(Player *p) {
+    for (int i = 0; i < p->laser_count; i++) {
+        if (!p->lasers[i].active) {
+            p->lasers[i].x = p->x + 24 ; // centré sur le vaisseau
+            p->lasers[i].y = p->y;
+            p->lasers[i].dy = -5.5;
+            p->lasers[i].active = 1;
+            return; // on tire un seul laser à la fois
+        }
+    }
 }
 
 void player_update (Player *p) {
     float new_x = p->x + p->dx;
-    if (new_x > 0 && new_x < SCREEN_W) p->x = new_x;
+    if (new_x < 0) p->x = 0;
+    else if (new_x + 60 > SCREEN_W) p->x = SCREEN_W - 60;
+    else p->x = new_x;
     p->dx *= 0.95;
+
+    for (int i = 0; i < p->laser_count; i++) {
+        if (p->lasers[i].active) {
+            p->lasers[i].y += p->lasers[i].dy;
+            p->lasers[i].frame_timer++;
+            if (p->lasers[i].frame_timer >= 5) {
+                p->lasers[i].frame_timer = 0;
+                p->lasers[i].frame = (p->lasers[i].frame + 1) % 4;
+            }
+            if (p->lasers[i].y < 0)
+                p->lasers[i].active = 0;
+        }
+    }
 }
 
 void player_move_left (Player *p) {
@@ -26,4 +61,11 @@ void player_move_left (Player *p) {
 void player_move_right (Player *p) {
     if (p->dx < p->vmax) p->dx += p->ddx;
 }
+
+void player_destroy(Player **p) {
+    free((*p)->lasers);
+    free(*p);
+    *p = NULL;
+}
+
 

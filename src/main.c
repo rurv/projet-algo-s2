@@ -18,9 +18,15 @@ int main() {
     player_init(&player);
 
     srand(time(NULL));
+    int space_pressed = 0;
     while (!key[KEY_ESC]) {
+        if (key[KEY_SPACE] && !space_pressed) {
+            player_shot(&player);
+            space_pressed = 1;
+        }
+        if (!key[KEY_SPACE]) space_pressed = 0;
         game_update (&player);
-        display(&bmps, &assets, player);
+        display(&bmps, &assets, &player);
     }
     readkey();
     destroy_display(&bmps, &assets);

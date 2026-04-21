@@ -36,10 +36,24 @@ void init_display (Bitmaps *b, Assets *assets) {
     destroy_bitmap(etoile);
 }
 
-void display (Bitmaps *b, Assets *assets, Player p) {
+void display (Bitmaps *b, Assets *assets, Player *p) {
     clear_bitmap(b->buffer);
-    masked_blit(b->fond, b->buffer, 0, 0, 0, 0, b->fond->w, b->fond->h);
-    masked_blit(assets->player_sprites, b->buffer, 152, 336, p.x, p.y, 48, 64);
+    int ox = (p->dx * 3);
+    masked_blit(b->fond, b->buffer,  ox, 0, 0, 0, b->fond->w, b->fond->h);
+
+    for (int i = 0; i < p->laser_count; i++) {
+        if (p->lasers[i].active) {
+            masked_blit(assets->laser_sprite, b->buffer,
+                        0, p->lasers[i].frame * 66,
+                        p->lasers[i].x-3,
+                        p->lasers[i].y-50,
+                        22, 66);
+        }
+    }
+
+    BITMAP *sub = create_sub_bitmap(assets->player_sprites, 152, 336, 48, 64);
+    stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);  //
+    destroy_bitmap(sub);
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
