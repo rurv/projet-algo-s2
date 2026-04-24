@@ -7,6 +7,7 @@
 
 #include <allegro.h>
 #include "player.h"
+#include "boss.h"
 
 void game_update (Player *player);
 

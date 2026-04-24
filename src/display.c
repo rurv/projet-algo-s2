@@ -30,6 +30,7 @@ void init_display (Bitmaps *b, Assets *assets) {
     clear_to_color(b->fond, makecol(255, 0, 255));
     BITMAP *etoile = create_bitmap(2, 2);
     clear_to_color(etoile, makecol(255, 255, 255));
+    b->fond_scroll_x = 0.0;
     for (int i = 0; i < 200; i++) {
         blit(etoile, b->fond, 0, 0, rand() % b->fond->w, rand() % b->fond->h, etoile->w, etoile->h);
     }
@@ -38,8 +39,32 @@ void init_display (Bitmaps *b, Assets *assets) {
 
 void display (Bitmaps *b, Assets *assets, Player *p) {
     clear_bitmap(b->buffer);
-    int ox = (p->dx * 3);
-    masked_blit(b->fond, b->buffer,  ox, 0, 0, 0, b->fond->w, b->fond->h);
+    /*if (key[KEY_E]) {
+        int x = SCREEN_W / 2;
+        int segments = 8;
+        int seg_h = SCREEN_H / segments;
+        int x_courant = x;
+
+        for (int i = 0; i < segments; i++) {
+            int x_next = x + (rand() % 20 - 10);
+            int y_debut = i * seg_h;
+            int y_fin   = (i + 1) * seg_h;
+
+            line(b->buffer, x_courant - 2, y_debut, x_next + 2, y_fin, makecol(80, 0, 120));
+            line(b->buffer, x_courant - 1, y_debut, x_next + 1, y_fin, makecol(150, 0, 255));
+            line(b->buffer, x_courant,     y_debut, x_next,     y_fin, makecol(255, 255, 255));
+            line(b->buffer, x_courant + 1, y_debut, x_next - 1, y_fin, makecol(150, 0, 255));
+            line(b->buffer, x_courant + 2, y_debut, x_next - 2, y_fin, makecol(80, 0, 120));
+
+            x_courant = x_next;
+        }
+    }*/
+    b->fond_scroll_x += p->dx * 0.35;
+
+    int ox = ((int)b->fond_scroll_x % b->fond->w + b->fond->w) % b->fond->w;
+
+    masked_blit(b->fond, b->buffer, ox, 0, 0, 0, SCREEN_W - ox, SCREEN_H);
+    masked_blit(b->fond, b->buffer, 0, 0, SCREEN_W - ox, 0, ox, SCREEN_H);
 
     for (int i = 0; i < p->laser_count; i++) {
         if (p->lasers[i].active) {

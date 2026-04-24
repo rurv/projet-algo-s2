@@ -24,6 +24,8 @@ add_executable(projet_algo_s2
         src/config.c
         headers/config.h
         src/save.c
-        headers/save.h)
+        headers/save.h
+        src/boss.c
+        headers/boss.h)
 
 target_link_libraries(projet_algo_s2 -lmingw32 -lalleg44)

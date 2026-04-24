@@ -16,6 +16,7 @@ typedef struct Bitmaps {
     BITMAP *ship;
     BITMAP *fond;
     BITMAP *asteroid;
+    float fond_scroll_x;
 } Bitmaps;
 
 void initialisation_allegro();  // initialisation de allegro
