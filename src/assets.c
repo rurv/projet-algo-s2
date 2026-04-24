@@ -8,6 +8,7 @@ void load_assets (Assets *a) {
     // a->... = load_bitmap("assets/images/... .bmp", NULL);
     a->player_sprites = load_bitmap("assets/images/sprites_ships.bmp", NULL);
     a->laser_sprite = load_bitmap("../assets/images/laser.bmp", NULL);
+    a->boss = load_bitmap("../assets/images/boss.bmp", NULL);
 
     // if (!a->...) { ... }
     if (!a->player_sprites) {
@@ -20,11 +21,17 @@ void load_assets (Assets *a) {
         allegro_exit();
         exit(1);
     }
+    if (!a->boss) {
+        allegro_message("Erreur chargement boss.bmp");
+        allegro_exit();
+        exit(1);
+    }
 }
 
 void free_assets (Assets *a) {
     // destroy_bitmap(a->...);
     destroy_bitmap(a->player_sprites);
     destroy_bitmap(a->laser_sprite);
+    destroy_bitmap(a->boss);
 }
 

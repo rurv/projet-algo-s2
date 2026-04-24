@@ -17,6 +17,8 @@ int main() {
     init_display(&bmps, &assets);
     Player player;
     player_init(&player);
+    Boss boss;
+    boss_init(&boss);
     Audio audio;
     audio_init(&audio);
 
@@ -29,8 +31,8 @@ int main() {
             space_pressed = 1;
         }
         if (!key[KEY_SPACE]) space_pressed = 0;
-        game_update (&player);
-        display(&bmps, &assets, &player);
+        game_update (&player, &boss);
+        display(&bmps, &assets, &player, &boss);
 
     }
     readkey();

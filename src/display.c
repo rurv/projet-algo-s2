@@ -37,7 +37,7 @@ void init_display (Bitmaps *b, Assets *assets) {
     destroy_bitmap(etoile);
 }
 
-void display (Bitmaps *b, Assets *assets, Player *p) {
+void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     clear_bitmap(b->buffer);
     /*if (key[KEY_E]) {
         int x = SCREEN_W / 2;
@@ -77,8 +77,14 @@ void display (Bitmaps *b, Assets *assets, Player *p) {
     }
 
     BITMAP *sub = create_sub_bitmap(assets->player_sprites, 152, 336, 48, 64);
-    stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);  //
+    stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
     destroy_bitmap(sub);
+    masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
+    // fond gris
+    rectfill(b->buffer, 10, 10, 210, 25, makecol(80, 80, 80));
+    // barre rouge proportionnelle aux PV
+    int largeur = (int)(200 * boss->pv / BOSS_MAX_PV);
+    rectfill(b->buffer, 10, 10, 10 + largeur, 25, makecol(255, 0, 0));
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 

@@ -12,10 +12,46 @@ void boss_move_right (Boss *b) {
     if (b->dx < b->vmax) b->dx += b->ddx;
 }
 
-void Boss_update (Boss *b) {
+void boss_update(Boss *b) {
+    // déplacement
+    if (b->moving) {
+        if (b->direction == 1) boss_move_right(b);
+        else boss_move_left(b);
+    }
+
+    // timer
+    b->move_timer--;
+    if (b->move_timer <= 0) {
+        if (b->moving) {
+            // passe en repos
+            b->moving = 0;
+            b->move_timer = 300;
+        } else {
+            // repart dans une direction aléatoire
+            b->moving = 1;
+            b->direction = (rand() % 2 == 0) ? 1 : -1;
+            b->move_timer = 60 +rand() % 60;  // bouge 1 à 2 sec
+        }
+    }
+
+    // position
     float new_x = b->x + b->dx;
-    if (new_x < 0) b->x = 0;
-    else if (new_x + 60 > SCREEN_W) b->x = SCREEN_W - 60;
+    if (new_x < 0) { b->x = 0; b->direction = 1; }
+    else if (new_x + 300 > SCREEN_W) { b->x = SCREEN_W - 300; b->direction = -1; }
     else b->x = new_x;
+
     b->dx *= 0.95;
+}
+
+void boss_init(Boss *b) {
+    b->x = SCREEN_W/2.0 - 150 ; b->y = 25;
+    b->pv = BOSS_MAX_PV;
+    b->vmax = 7.0;
+    b->dx = 0.0;
+    b->ddx = 0.5;
+    b->eclairs = malloc(BOSS_MAX_ECLAIRS * sizeof(Eclair));
+    b->eclair_count = BOSS_MAX_ECLAIRS;
+    b->move_timer = 60;
+    b->moving = 0;
+    b->direction = 1;
 }

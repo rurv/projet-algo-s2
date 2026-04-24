@@ -15,7 +15,7 @@ typedef struct Eclair {
 } Eclair;
 
 typedef struct Boss {
-    float x;
+    float x, y;
     float dx;
     float ddx;
     float pv;
@@ -26,6 +26,9 @@ typedef struct Boss {
     float vmax;
     Eclair *eclairs;
     int eclair_count;
+    int move_timer;   // durée du mouvement ou du repos
+    int moving;       // 1 = en mouvement, 0 = au repos
+    int direction; // 1 = droite, -1 = gauche
 } Boss;
 
 void boss_init(Boss *b);

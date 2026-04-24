@@ -10,6 +10,7 @@
 #include "config.h"
 #include "assets.h"
 #include "player.h"
+#include "boss.h"
 
 typedef struct Bitmaps {
     BITMAP *buffer;
@@ -22,7 +23,7 @@ typedef struct Bitmaps {
 void initialisation_allegro();  // initialisation de allegro
 void init_display(Bitmaps *b, Assets *assets);   // initialisation du buffer et des assets
 BITMAP *player_sprite (Assets assets);
-void display(Bitmaps *b, Assets *assets, Player *p); // affichage
+void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss); // affichage
 void destroy_display(Bitmaps *b, Assets *assets); // liberation du buffer
 
 #endif //PROJET_ALGO_S2_DISPLAY_H
