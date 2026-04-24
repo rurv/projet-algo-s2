@@ -6,7 +6,7 @@
 
 void audio_init(Audio *a) {
     install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
-    a->laser_sfx = load_sample("C:/Users/Ghiwane/CLionProjects/projet-algo--s2/assets/sfx/laserSFX.wav");
+    a->laser_sfx = load_sample("../assets/sfx/laserSFX.wav");
     if (!a->laser_sfx) {
         allegro_message("Erreur chargement laserSFX.wav");
         allegro_exit();
