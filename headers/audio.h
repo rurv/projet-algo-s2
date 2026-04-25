@@ -8,10 +8,12 @@
 
 typedef struct Audio {
     SAMPLE *laser_sfx;
+    SAMPLE *explode_sfx;
 } Audio;
 
 void audio_init(Audio *a);
 void audio_destroy(Audio *a);
 void audio_play_laser(Audio *a);
+void audio_play_explode(Audio *a);
 
 #endif //PROJET_ALGO_S2_AUDIO_H

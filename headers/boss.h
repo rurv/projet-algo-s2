@@ -29,6 +29,8 @@ typedef struct Boss {
     int move_timer;   // durée du mouvement ou du repos
     int moving;       // 1 = en mouvement, 0 = au repos
     int direction; // 1 = droite, -1 = gauche
+    int exp_frame;
+    int exp_timer;
 } Boss;
 
 void boss_init(Boss *b);

@@ -12,14 +12,22 @@ void audio_init(Audio *a) {
         allegro_exit();
         exit(1);
     }
+    a->explode_sfx = load_sample("../assets/sfx/explodeSFX.wav");
+    if (!a->explode_sfx) {
+        allegro_message("Erreur chargement explodeSFX.wav");
+        allegro_exit();
+        exit(1);
+    }
 }
 
 void audio_destroy(Audio *a) {
     destroy_sample(a->laser_sfx);
+    destroy_sample(a->explode_sfx);
 }
 
 void audio_play_laser(Audio *a) {
     play_sample(a->laser_sfx, 200, 128, 1000, 0);
-    //                         ^      ^     ^    ^ loop (0=non)
-    //                         vol  pan  freq
+}
+void audio_play_explode(Audio *a) {
+    play_sample(a->explode_sfx, 200, 128, 1000, 0);
 }

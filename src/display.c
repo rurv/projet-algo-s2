@@ -79,12 +79,30 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     BITMAP *sub = create_sub_bitmap(assets->player_sprites, 152, 336, 48, 64);
     stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
     destroy_bitmap(sub);
-    masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
+
+    if (boss->active) masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
     // fond gris
     rectfill(b->buffer, 10, 10, 210, 25, makecol(80, 80, 80));
     // barre rouge proportionnelle aux PV
     int largeur = (int)(200 * boss->pv / BOSS_MAX_PV);
     rectfill(b->buffer, 10, 10, 10 + largeur, 25, makecol(255, 0, 0));
+
+    if (boss->pv <= 0) {
+        boss->active=0;
+        boss->exp_timer++;
+        if (boss->exp_timer >= 5) {  // vitesse animation
+            boss->exp_timer = 0;
+            boss->exp_frame++;
+        }
+
+        if (boss->exp_frame < 50) {  // 50 frames au total (5 lignes x 10 colonnes)
+            int col = boss->exp_frame % 10;   // colonne 0-9
+            int row = boss->exp_frame / 10;   // ligne 0-4
+
+            masked_stretch_blit(assets->explosion1, b->buffer, col*100, row*100,100,100, boss->x, boss->y,300,185);
+        }
+    }
+
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 

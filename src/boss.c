@@ -54,4 +54,7 @@ void boss_init(Boss *b) {
     b->move_timer = 60;
     b->moving = 0;
     b->direction = 1;
+    b->exp_frame = 0;
+    b->exp_timer = 0;
+    b->active=1;
 }

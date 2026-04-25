@@ -24,6 +24,7 @@ int main() {
 
     srand(time(NULL));
     int space_pressed = 0;
+    int boss_dead_sound = 0;
     while (!key[KEY_ESC]) {
         if (key[KEY_SPACE] && !space_pressed) {
             player_shot(&player);
@@ -32,8 +33,11 @@ int main() {
         }
         if (!key[KEY_SPACE]) space_pressed = 0;
         game_update (&player, &boss);
+        if (boss.pv <= 0 && !boss_dead_sound) {
+            audio_play_explode(&audio);
+            boss_dead_sound = 1;
+        }
         display(&bmps, &assets, &player, &boss);
-
     }
     readkey();
     audio_destroy(&audio);

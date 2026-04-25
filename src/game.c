@@ -4,6 +4,8 @@
 
 #include "../headers/game.h"
 
+#include "../headers/audio.h"
+
 void game_update (Player *player, Boss *boss) {
     player_update (player);
     boss_update (boss);
@@ -19,6 +21,7 @@ void colision(Player *player, Boss *boss) {
         if (player->lasers[i].x >= boss->x && player->lasers[i].y >= boss->y && player->lasers[i].x <= boss->x + 300 && player->lasers[i].y <= boss->y + 185) {
         player->lasers[i].active = 0;
         boss->pv -= 10;
+        if (boss->pv <= 0) boss->pv = 0;
         }
     }
 }
