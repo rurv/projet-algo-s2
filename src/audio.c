@@ -8,15 +8,21 @@ void audio_init(Audio *a) {
     install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
     a->laser_sfx = load_sample("../assets/sfx/laserSFX.wav");
     if (!a->laser_sfx) {
-        allegro_message("Erreur chargement laserSFX.wav");
-        allegro_exit();
-        exit(1);
+        a->laser_sfx = load_sample("assets/sfx/laserSFX.wav");
+        if (!a->laser_sfx) {
+            allegro_message("Erreur chargement laserSFX.wav");
+            allegro_exit();
+            exit(1);
+        }
     }
     a->explode_sfx = load_sample("../assets/sfx/explodeSFX.wav");
     if (!a->explode_sfx) {
-        allegro_message("Erreur chargement explodeSFX.wav");
-        allegro_exit();
-        exit(1);
+        a->explode_sfx = load_sample("assets/sfx/explodeSFX.wav");
+        if (!a->explode_sfx) {
+            allegro_message("Erreur chargement explodeSFX.wav");
+            allegro_exit();
+            exit(1);
+        }
     }
 }
 
