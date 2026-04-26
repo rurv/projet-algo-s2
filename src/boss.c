@@ -47,7 +47,7 @@ void boss_update(Boss *b) {
     b->eclair_timer--;
 
     if (b->eclair_timer <= 0 && b->eclair_timer > -100) {
-        b->eclair_active = 1;      // actif pendant 10 frames
+        b->eclair_active = 1;      // actif pendant 100 frames
     } else {
         b->eclair_active = 0;
         if (b->eclair_timer <= -100) {

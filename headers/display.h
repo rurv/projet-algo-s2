@@ -24,7 +24,7 @@ void initialisation_allegro();  // initialisation de allegro
 void init_display(Bitmaps *b, Assets *assets);   // initialisation du buffer et des assets
 BITMAP *player_sprite (Assets assets);
 void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss); // affichage
-void display_eclair(Bitmaps *b, Boss *boss, int active); // affiche les eclairs du boss
+void display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active); // affiche les eclairs du boss
 void destroy_display(Bitmaps *b, Assets *assets); // liberation du buffer
 
 #endif //PROJET_ALGO_S2_DISPLAY_H

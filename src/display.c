@@ -84,7 +84,7 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
         }
     }
 
-    display_eclair(b, boss, boss->eclair_active);
+    display_eclair(b, boss, boss->eclair_active, boss->active);
 
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
@@ -97,41 +97,33 @@ void destroy_display (Bitmaps *b, Assets *assets) {
     destroy_bitmap(b->asteroid);
 }
 
-void display_eclair(Bitmaps *b, Boss *boss, int active) {
-    if (active) {
-        int eclair1 = 100;
-        int eclair2 = 200;
-        int x_courant1 = boss->x + eclair1;
-        int x_courant2 = boss->x + eclair2;
-        int segments = 8;
-        int seg_h = SCREEN_H / segments;
-        int offset = 160;
+void display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active) {
+    if (!active || !boss_active) return;
 
-        // Définition des couleurs une seule fois pour éviter de rappeler makecol 40 fois par frame
-        int col_core  = makecol(255, 255, 255);
-        int col_glow  = makecol(100, 0, 255);
-        int col_edge  = makecol(50, 0, 255);
+    int pos_x[] = {100, 200};
+    int colors[] = {makecol(50, 0, 150), makecol(120, 0, 255), makecol(255, 255, 255)};
+    int sizes[] = {15, 7, 2}; // glow_éxt, corps, centre
 
-        for (int i = 0; i < segments; i++) {
-            int x_next1 = boss->x+eclair1 + (rand() % 21 - 10);
-            int x_next2 = boss->x+eclair2 + (rand() % 21 - 10);
-            int y1 = i * seg_h + offset;
-            int y2 = (i + 1) * seg_h +offset;
+    int segments = 20;
+    int offset_y = 160;
+    // Calcul pour que la fin du dernier segment soit SCREEN_H
+    int seg_h = (SCREEN_H - offset_y) / segments;
 
-            // Tracé des lignes (de la plus large à la plus fine)
-            line(b->buffer, x_courant1 - 4, y1, x_next1 + 4, y2, col_edge);
-            line(b->buffer, x_courant1 + 4, y1, x_next1 - 4, y2, col_edge);
-            line(b->buffer, x_courant1 - 2, y1, x_next1 + 2, y2, col_glow);
-            line(b->buffer, x_courant1 + 2, y1, x_next1 - 1, y2, col_glow);
-            line(b->buffer, x_courant1,     y1, x_next1,     y2, col_core);
-            line(b->buffer, x_courant2 - 4, y1, x_next2 + 4, y2, col_edge);
-            line(b->buffer, x_courant2 + 4, y1, x_next2 - 4, y2, col_edge);
-            line(b->buffer, x_courant2 - 2, y1, x_next2 + 2, y2, col_glow);
-            line(b->buffer, x_courant2 + 2, y1, x_next2 - 1, y2, col_glow);
-            line(b->buffer, x_courant2,     y1, x_next2,     y2, col_core);
+    for (int i = 0; i < 2; i++) {
+        int cur_x = boss->x + pos_x[i];
 
-            x_courant1 = x_next1;
-            x_courant2 = x_next2;
+        for (int j = 0; j < segments; j++) {
+            int next_x = (boss->x + pos_x[i]) + (rand() % 21 - 10);
+            int y1 = j * seg_h + offset_y;
+            // Pour le dernier segment, on force y2 à SCREEN_H
+            int y2 = (j == segments - 1) ? SCREEN_H : (j + 1) * seg_h + offset_y;
+
+            for (int k = 0; k < 3; k++) {
+                for (int w = -sizes[k]; w <= sizes[k]; w++) {
+                    line(b->buffer, cur_x + w, y1, next_x + w, y2, colors[k]);
+                }
+            }
+            cur_x = next_x;
         }
     }
 }
