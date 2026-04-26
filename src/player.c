@@ -9,7 +9,8 @@ void player_init (Player *p) {
     p->dx = 0.0; p->dy = 0.0;
     p->ddx = 0.5; p->ddy = 0.0;
     p->vmax = 5.0;
-    p->pv = 10; p->invincible = 0;
+    p->vies = 3; p->invincible = 0;
+    p->invincible_timer=0;
     p->skin_id = 0;
     p->lasers = malloc(MAX_LASERS * sizeof(Laser));
     p->laser_count = MAX_LASERS;

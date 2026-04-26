@@ -23,8 +23,9 @@ typedef struct Player {
     float dx, dy;
     float ddx, ddy;
     float vmax;
-    int pv;
+    int vies;
     int invincible;
+    int invincible_timer;
     int skin_id;
     Laser *lasers;
     int laser_count;

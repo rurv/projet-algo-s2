@@ -26,5 +26,6 @@ BITMAP *player_sprite (Assets assets);
 void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss); // affichage
 void display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active); // affiche les eclairs du boss
 void destroy_display(Bitmaps *b, Assets *assets); // liberation du buffer
+void display_hud(Bitmaps *b, Player *p, Boss *boss);
 
 #endif //PROJET_ALGO_S2_DISPLAY_H

@@ -62,11 +62,7 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     destroy_bitmap(sub);
 
     if (boss->active) masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
-    // fond gris
-    rectfill(b->buffer, 10, 10, 210, 25, makecol(80, 80, 80));
-    // barre rouge proportionnelle aux PV
-    int largeur = (int)(200 * boss->pv / BOSS_MAX_PV);
-    rectfill(b->buffer, 10, 10, 10 + largeur, 25, makecol(255, 0, 0));
+    display_hud(b, p, boss);
 
     if (boss->pv <= 0) {
         boss->active=0;
@@ -125,5 +121,45 @@ void display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active) {
             }
             cur_x = next_x;
         }
+    }
+}
+
+void display_hud(Bitmaps *b, Player *p, Boss *boss) {
+    // === BARRE DE VIE BOSS STYLÉE ===
+    int bar_x = 10, bar_y = 10, bar_w = 200, bar_h = 18;
+
+    rectfill(b->buffer, bar_x - 2, bar_y - 2, bar_x + bar_w + 2, bar_y + bar_h + 2, makecol(20, 0, 0));
+    rectfill(b->buffer, bar_x, bar_y, bar_x + bar_w, bar_y + bar_h, makecol(60, 0, 0));
+
+    int largeur = (int)(bar_w * boss->pv / BOSS_MAX_PV);
+    if (largeur > 0) {
+        rectfill(b->buffer, bar_x, bar_y,           bar_x + largeur, bar_y + bar_h,     makecol(180, 0, 0));
+        rectfill(b->buffer, bar_x, bar_y,           bar_x + largeur, bar_y + bar_h/2,   makecol(255, 40, 40));
+        rectfill(b->buffer, bar_x, bar_y + bar_h-3, bar_x + largeur, bar_y + bar_h,     makecol(100, 0, 0));
+    }
+
+    rect(b->buffer, bar_x - 1, bar_y - 1, bar_x + bar_w + 1, bar_y + bar_h + 1, makecol(255, 80, 80));
+    textout_ex(b->buffer, font, "BOSS", bar_x + bar_w + 8, bar_y + 3, makecol(255, 80, 80), -1);
+
+    // === CŒURS DU JOUEUR ===
+    for (int v = 0; v < 3; v++) {
+        int hx = SCREEN_W - 20 - v * 28;
+        int hy = 10;
+        int col  = (v < p->vies) ? makecol(255, 60, 100) : makecol(80, 80, 80);
+        int col2 = (v < p->vies) ? makecol(255, 150, 170) : makecol(60, 60, 60);
+
+        putpixel(b->buffer, hx+2, hy+0, col); putpixel(b->buffer, hx+3, hy+0, col);
+        putpixel(b->buffer, hx+7, hy+0, col); putpixel(b->buffer, hx+8, hy+0, col);
+        for (int i = 1; i <= 9;  i++) putpixel(b->buffer, hx+i, hy+1, col);
+        for (int i = 0; i <= 10; i++) putpixel(b->buffer, hx+i, hy+2, col);
+        putpixel(b->buffer, hx+1, hy+2, col2); putpixel(b->buffer, hx+2, hy+2, col2);
+        for (int i = 0; i <= 10; i++) putpixel(b->buffer, hx+i, hy+3, col);
+        for (int i = 0; i <= 10; i++) putpixel(b->buffer, hx+i, hy+4, col);
+        putpixel(b->buffer, hx+1, hy+3, col2);
+        for (int i = 1; i <= 9;  i++) putpixel(b->buffer, hx+i, hy+5, col);
+        for (int i = 2; i <= 8;  i++) putpixel(b->buffer, hx+i, hy+6, col);
+        for (int i = 3; i <= 7;  i++) putpixel(b->buffer, hx+i, hy+7, col);
+        for (int i = 4; i <= 6;  i++) putpixel(b->buffer, hx+i, hy+8, col);
+        putpixel(b->buffer, hx+5, hy+9, col);
     }
 }

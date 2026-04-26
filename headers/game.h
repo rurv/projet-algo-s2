@@ -11,5 +11,6 @@
 
 void game_update (Player *player, Boss *boss);
 void colision(Player *player, Boss *boss);
+void colision_eclair(Player *player, Boss *boss);
 
 #endif //PROJET_ALGO_S2_GAME_H
