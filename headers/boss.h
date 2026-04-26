@@ -31,6 +31,8 @@ typedef struct Boss {
     int direction; // 1 = droite, -1 = gauche
     int exp_frame;
     int exp_timer;
+    int eclair_timer;
+    int eclair_active;
 } Boss;
 
 void boss_init(Boss *b);

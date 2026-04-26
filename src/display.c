@@ -39,26 +39,7 @@ void init_display (Bitmaps *b, Assets *assets) {
 
 void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     clear_bitmap(b->buffer);
-    /*if (key[KEY_E]) {
-        int x = SCREEN_W / 2;
-        int segments = 8;
-        int seg_h = SCREEN_H / segments;
-        int x_courant = x;
 
-        for (int i = 0; i < segments; i++) {
-            int x_next = x + (rand() % 20 - 10);
-            int y_debut = i * seg_h;
-            int y_fin   = (i + 1) * seg_h;
-
-            line(b->buffer, x_courant - 2, y_debut, x_next + 2, y_fin, makecol(80, 0, 120));
-            line(b->buffer, x_courant - 1, y_debut, x_next + 1, y_fin, makecol(150, 0, 255));
-            line(b->buffer, x_courant,     y_debut, x_next,     y_fin, makecol(255, 255, 255));
-            line(b->buffer, x_courant + 1, y_debut, x_next - 1, y_fin, makecol(150, 0, 255));
-            line(b->buffer, x_courant + 2, y_debut, x_next - 2, y_fin, makecol(80, 0, 120));
-
-            x_courant = x_next;
-        }
-    }*/
     b->fond_scroll_x += p->dx * 0.35;
 
     int ox = ((int)b->fond_scroll_x % b->fond->w + b->fond->w) % b->fond->w;
@@ -103,6 +84,8 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
         }
     }
 
+    display_eclair(b, boss, boss->eclair_active);
+
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
@@ -114,19 +97,41 @@ void destroy_display (Bitmaps *b, Assets *assets) {
     destroy_bitmap(b->asteroid);
 }
 
-void update_display (BITMAP *buffer, Assets *assets, Player *player) {
-    clear_bitmap(buffer);
+void display_eclair(Bitmaps *b, Boss *boss, int active) {
+    if (active) {
+        int eclair1 = 100;
+        int eclair2 = 200;
+        int x_courant1 = boss->x + eclair1;
+        int x_courant2 = boss->x + eclair2;
+        int segments = 8;
+        int seg_h = SCREEN_H / segments;
+        int offset = 160;
 
-    int sx = 152; // Coordonnée X dans .bmp
-    int sy = 336; // Coordonnée Y dans .bmp
-    int sw = 48;  // Largeur du sprite
-    int sh = 64;  // Hauteur du sprite
+        // Définition des couleurs une seule fois pour éviter de rappeler makecol 40 fois par frame
+        int col_core  = makecol(255, 255, 255);
+        int col_glow  = makecol(100, 0, 255);
+        int col_edge  = makecol(50, 0, 255);
 
-    player->x += player->dx;
+        for (int i = 0; i < segments; i++) {
+            int x_next1 = boss->x+eclair1 + (rand() % 21 - 10);
+            int x_next2 = boss->x+eclair2 + (rand() % 21 - 10);
+            int y1 = i * seg_h + offset;
+            int y2 = (i + 1) * seg_h +offset;
 
-    if (player->x < 0) player->x = 0;
-    if (player->x > SCREEN_W - sw) player->x = SCREEN_W - sw;
+            // Tracé des lignes (de la plus large à la plus fine)
+            line(b->buffer, x_courant1 - 4, y1, x_next1 + 4, y2, col_edge);
+            line(b->buffer, x_courant1 + 4, y1, x_next1 - 4, y2, col_edge);
+            line(b->buffer, x_courant1 - 2, y1, x_next1 + 2, y2, col_glow);
+            line(b->buffer, x_courant1 + 2, y1, x_next1 - 1, y2, col_glow);
+            line(b->buffer, x_courant1,     y1, x_next1,     y2, col_core);
+            line(b->buffer, x_courant2 - 4, y1, x_next2 + 4, y2, col_edge);
+            line(b->buffer, x_courant2 + 4, y1, x_next2 - 4, y2, col_edge);
+            line(b->buffer, x_courant2 - 2, y1, x_next2 + 2, y2, col_glow);
+            line(b->buffer, x_courant2 + 2, y1, x_next2 - 1, y2, col_glow);
+            line(b->buffer, x_courant2,     y1, x_next2,     y2, col_core);
 
-    masked_blit(assets->player_sprites, buffer, sx, sy, player->x, 650, sw, sh);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+            x_courant1 = x_next1;
+            x_courant2 = x_next2;
+        }
+    }
 }

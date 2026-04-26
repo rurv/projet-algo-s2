@@ -14,6 +14,7 @@ void boss_move_right (Boss *b) {
 
 void boss_update(Boss *b) {
     // déplacement
+    if (b->active==0) b->moving = 0;
     if (b->moving) {
         if (b->direction == 1) boss_move_right(b);
         else boss_move_left(b);
@@ -21,6 +22,7 @@ void boss_update(Boss *b) {
 
     // timer
     b->move_timer--;
+
     if (b->move_timer <= 0) {
         if (b->moving) {
             // passe en repos
@@ -41,6 +43,17 @@ void boss_update(Boss *b) {
     else b->x = new_x;
 
     b->dx *= 0.95;
+
+    b->eclair_timer--;
+
+    if (b->eclair_timer <= 0 && b->eclair_timer > -100) {
+        b->eclair_active = 1;      // actif pendant 10 frames
+    } else {
+        b->eclair_active = 0;
+        if (b->eclair_timer <= -100) {
+            b->eclair_timer = 300 + rand()%301; // réinitialise le cooldown
+        }
+    }
 }
 
 void boss_init(Boss *b) {
@@ -57,4 +70,6 @@ void boss_init(Boss *b) {
     b->exp_frame = 0;
     b->exp_timer = 0;
     b->active=1;
+    b->eclair_timer=420;
+    b->eclair_active=0;
 }
