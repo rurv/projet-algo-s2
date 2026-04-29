@@ -40,12 +40,14 @@ void init_display (Bitmaps *b, Assets *assets) {
 void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     clear_bitmap(b->buffer);
 
+
     b->fond_scroll_x += p->dx * 0.35;
 
     int ox = ((int)b->fond_scroll_x % b->fond->w + b->fond->w) % b->fond->w;
 
     masked_blit(b->fond, b->buffer, ox, 0, 0, 0, SCREEN_W - ox, SCREEN_H);
     masked_blit(b->fond, b->buffer, 0, 0, SCREEN_W - ox, 0, ox, SCREEN_H);
+
 
     for (int i = 0; i < p->laser_count; i++) {
         if (p->lasers[i].active) {
@@ -60,6 +62,7 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     BITMAP *sub = create_sub_bitmap(assets->player_sprites, 152, 336, 48, 64);
     stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
     destroy_bitmap(sub);
+
 
     if (boss->active) masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
     display_hud(b, p, boss);
@@ -81,7 +84,7 @@ void display (Bitmaps *b, Assets *assets, Player *p, Boss *boss) {
     }
 
     display_eclair(b, boss, boss->eclair_active, boss->active);
-
+    masked_blit(assets->claude, b->buffer, 0, 0, SCREEN_W/2 - 160, SCREEN_H/2 - 146, 320, 292);
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 

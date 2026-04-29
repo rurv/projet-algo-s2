@@ -19,6 +19,7 @@ typedef struct Assets {
     BITMAP *laser_sprite;
     BITMAP *boss;
     BITMAP *explosion1;
+    BITMAP * claude;
 } Assets;
 
 void load_assets (Assets *a);   // chargement des assets

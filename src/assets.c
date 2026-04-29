@@ -10,6 +10,7 @@ void load_assets (Assets *a) {
     a->laser_sprite = load_bitmap("assets/images/laser.bmp", NULL);
     a->boss = load_bitmap("assets/images/boss.bmp", NULL);
     a->explosion1 = load_bitmap("assets/images/explosion1.bmp", NULL);
+    a->claude = load_bitmap("assets/images/claude.bmp", NULL);
 
     // if (!a->...) { ... }
     if (!a->player_sprites) {
@@ -44,13 +45,20 @@ void load_assets (Assets *a) {
             exit(1);
         }
     }
+    if (!a->claude) {
+        a->claude = load_bitmap("../assets/images/claude.bmp", NULL);
+        if (!a->claude) {
+            allegro_message("Erreur chargement claude.bmp");
+            allegro_exit();
+            exit(1);
+        }
+    }
 }
-
-void free_assets (Assets *a) {
-    // destroy_bitmap(a->...);
-    destroy_bitmap(a->player_sprites);
-    destroy_bitmap(a->laser_sprite);
-    destroy_bitmap(a->boss);
-    destroy_bitmap(a->explosion1);
-}
-
+    void free_assets (Assets *a) {
+        // destroy_bitmap(a->...);
+        destroy_bitmap(a->player_sprites);
+        destroy_bitmap(a->laser_sprite);
+        destroy_bitmap(a->boss);
+        destroy_bitmap(a->explosion1);
+        destroy_bitmap(a->claude);
+    }
