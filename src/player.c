@@ -27,7 +27,7 @@ void player_shot(Player *p) {
         if (!p->lasers[i].active) {
             p->lasers[i].x = p->x + 24 ; // centré sur le vaisseau
             p->lasers[i].y = p->y;
-            p->lasers[i].dy = -5.5;
+            p->lasers[i].dy = -10.0;
             p->lasers[i].active = 1;
             return; // on tire un seul laser à la fois
         }
