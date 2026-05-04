@@ -7,8 +7,8 @@
 void player_init (Player *p) {
     p->x = SCREEN_W/2.0; p->y = SCREEN_H/5.0*4.0;
     p->dx = 0.0; p->dy = 0.0;
-    p->ddx = 0.5; p->ddy = 0.0;
-    p->vmax = 5.0;
+    p->ddx = 1.5; p->ddy = 0.0;
+    p->vmax = 15.0;
     p->vies = 3; p->invincible = 0;
     p->invincible_timer=0;
     p->skin_id = 0;
@@ -27,7 +27,7 @@ void player_shot(Player *p) {
         if (!p->lasers[i].active) {
             p->lasers[i].x = p->x + 24 ; // centré sur le vaisseau
             p->lasers[i].y = p->y;
-            p->lasers[i].dy = -10.0;
+            p->lasers[i].dy = -30.0;
             p->lasers[i].active = 1;
             return; // on tire un seul laser à la fois
         }
@@ -39,7 +39,7 @@ void player_update (Player *p) {
     if (new_x < 0) p->x = 0;
     else if (new_x + 60 > SCREEN_W) p->x = SCREEN_W - 60;
     else p->x = new_x;
-    p->dx *= 0.95;
+    p->dx *= 0.90;
 
     for (int i = 0; i < p->laser_count; i++) {
         if (p->lasers[i].active) {
