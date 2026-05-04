@@ -22,6 +22,7 @@ int main() {
     Audio audio;
     audio_init(&audio);
 
+    Game game = init_game();
     srand(time(NULL));
     int space_pressed = 0;
     int boss_dead_sound = 0;

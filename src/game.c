@@ -4,7 +4,55 @@
 
 #include "../headers/game.h"
 
+#include <stdio.h>
+
 #include "../headers/audio.h"
+
+Game init_game(void) {
+    Game game;
+    FILE *lvld = fopen("data/levels.txt", "r");
+    if (!lvld) {
+        lvld = fopen("../data/levels.txt", "r");
+        if (!lvld) {
+            allegro_message("Erreur ouverture /data/levels.txt");
+            allegro_exit();
+            exit(1);
+        }
+    }
+    int nlevels;
+    if (fscanf(lvld, "%d", &nlevels) != 1 || nlevels <= 0) {
+        allegro_message("Erreur lecture nombre de niveaux");
+        fclose(lvld);
+        allegro_exit();
+        exit(1);
+    }
+    Level **levels = malloc(nlevels * sizeof(Level *));
+    if (!levels) {
+        allegro_message("Erreur allocation levels");
+        fclose(lvld);
+        allegro_exit();
+        exit(1);
+    }
+    for (int i = 0; i < nlevels; i++) {
+        levels[i] = malloc(sizeof(Level));
+        if (!levels[i]) {
+            allegro_message("Erreur allocation level %d", i);
+            fclose(lvld);
+            allegro_exit();
+            exit(1);
+        }
+        if (fscanf(lvld, "%d %d", &levels[i]->n, &levels[i]->is_boss_level) != 2) {
+            allegro_message("Erreur lecture niveau %d", i);
+            fclose(lvld);
+            allegro_exit();
+            exit(1);
+        }
+    }
+    fclose(lvld);
+    game.levels  = levels;
+    game.nlevels = nlevels;
+    return game;
+}
 
 void game_update (Player *player, Boss *boss) {
     player_update (player);

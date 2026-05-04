@@ -9,6 +9,21 @@
 #include "player.h"
 #include "boss.h"
 
+typedef struct Level{
+    int n;
+    int is_boss_level;
+    struct Level* next_level;
+} Level;
+
+typedef struct {
+    int nlevels;
+    Level** levels;
+    Level* current_level;
+} Game;
+
+
+Level create_level(int n, int is_boss_level);
+Game init_game (void);
 void game_update (Player *player, Boss *boss);
 void colision(Player *player, Boss *boss);
 void colision_eclair(Player *player, Boss *boss);
