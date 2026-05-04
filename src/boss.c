@@ -51,7 +51,7 @@ void boss_update(Boss *b) {
     } else {
         b->eclair_active = 0;
         if (b->eclair_timer <= -100) {
-            b->eclair_timer = 300 + rand()%301; // réinitialise le cooldown
+            b->eclair_timer = 100 + rand()%301 ; // réinitialise le cooldown
         }
     }
 }
@@ -59,9 +59,9 @@ void boss_update(Boss *b) {
 void boss_init(Boss *b) {
     b->x = SCREEN_W/2.0 - 150 ; b->y = 25;
     b->pv = BOSS_MAX_PV;
-    b->vmax = 7.0;
+    b->vmax = 15.0;
     b->dx = 0.0;
-    b->ddx = 0.5;
+    b->ddx = 1.5;
     b->eclairs = malloc(BOSS_MAX_ECLAIRS * sizeof(Eclair));
     b->eclair_count = BOSS_MAX_ECLAIRS;
     b->move_timer = 60;
@@ -70,6 +70,6 @@ void boss_init(Boss *b) {
     b->exp_frame = 0;
     b->exp_timer = 0;
     b->active=1;
-    b->eclair_timer=420;
+    b->eclair_timer=300;
     b->eclair_active=0;
 }

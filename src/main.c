@@ -44,6 +44,7 @@ int main() {
         }
 
         display(&bmps, &assets, &player, &boss, &game);
+        rest(1);
     }
 
     readkey();
