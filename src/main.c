@@ -23,6 +23,8 @@ int main() {
     audio_init(&audio);
 
     Game game = init_game();
+    game.current_level = game.levels[0];
+
     srand(time(NULL));
     int space_pressed = 0;
     int boss_dead_sound = 0;
