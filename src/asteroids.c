@@ -8,15 +8,15 @@ static int ground_y(void) {
 }
 
 /* Dessine le sprite 128x128 centré sur (cx, cy), mis à l'échelle selon le rayon */
-static void draw_asteroid(Assets a, BITMAP *buf, float cx, float cy, float r) {
+static void draw_asteroid(Assets a, BITMAP *buf, float cx, float cy, float r, int frame) {
     int size = (int)(r * 2);
     if (size < 2) size = 2;
 
     if (a.asteroid_sprites) {
         /* Le sprite existe : on l'étire, fond magenta masqué */
         masked_stretch_blit(a.asteroid_sprites, buf,
-                            0, 0, 128, 128,
-                            (int)(cx - r), (int)(cy - r), size, size);
+                        frame*128, 0, 128, 128,
+                        (int)(cx - r), (int)(cy - r), size, size);
     } else {
         /* Fallback cercle marron si sprite absent */
         circlefill(buf, (int)cx, (int)cy, (int)r, makecol(139, 90, 43));
@@ -46,6 +46,8 @@ static void spawn_one(AsteroidManager *am) {
         a->dx = (float)(rand() % 5 + 1) * (rand() % 2 ? 1.0f : -1.0f);
         a->dy = (float)(rand() % 3 + 1);
         a->active = 1;
+        a->frame = rand() % 64;
+        a->frame_timer = 0;
         am->spawned++;
         am->count++;
         return;
@@ -83,6 +85,12 @@ void asteroids_update(AsteroidManager *am) {
         a->x  += a->dx;
         a->y  += a->dy;
 
+        a->frame_timer++;
+        if (a->frame_timer >= 4) {
+            a->frame_timer = 0;
+            a->frame = (a->frame + 1) % 64;
+        }
+
         /* Rebonds */
         if (a->y + a->radius >= gy)                { a->y = gy - a->radius;           a->dy = -a->dy; }
         if (a->x - a->radius <= 0)                 { a->x = a->radius;                a->dx = -a->dx; }
@@ -95,7 +103,7 @@ void asteroids_draw(Assets as, BITMAP *buffer, AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         Asteroid *a = &am->asteroids[i];
         if (!a->active) continue;
-        draw_asteroid(as, buffer, a->x, a->y, a->radius);
+        draw_asteroid(as, buffer, a->x, a->y, a->radius, a->frame);
     }
 }
 

@@ -10,18 +10,19 @@
 typedef struct Asteroid {
     float x, y;
     float dx, dy;
-    float   radius;
+    float radius;
     int   active;
+    int   frame, frame_timer;
 } Asteroid;
 
 typedef struct AsteroidManager {
     Asteroid asteroids[MAX_ASTEROIDS];
-    int      count;        // actifs + à spawner
-    int      spawned;      // combien ont été créés
-    int      to_spawn;     // total à spawner ce niveau
-    int      spawn_timer;
-    float    gravity;
-    float    max_size;
+    int     count;        // actifs + à spawner
+    int     spawned;      // combien ont été créés
+    int     to_spawn;     // total à spawner ce niveau
+    int     spawn_timer;
+    float   gravity;
+    float   max_size;
 } AsteroidManager;
 
 void  asteroids_init(AsteroidManager *am, float gravity, int to_spawn, float max_size);
