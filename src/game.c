@@ -56,7 +56,7 @@ Game init_game(void) {
     for (int i = 0; i < nlevels; i++) {
         levels[i] = malloc(sizeof(Level));
         if (!levels[i]) { allegro_message("Erreur malloc level"); fclose(f); allegro_exit(); exit(1); }
-        if (fscanf(f, "%d %d %f %d %d",
+        if (fscanf(f, "%d %d %f %d %f",
                    &levels[i]->n,
                    &levels[i]->is_boss_level,
                    &levels[i]->gravity,
