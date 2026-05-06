@@ -21,7 +21,7 @@ int game_ground_height(void) {
 static void load_level_asteroids(Game *game) {
     Level *lv = game->current_level;
     if (lv->is_boss_level)
-        asteroids_init(&game->am, 0.0f, 0, 0);
+        asteroids_init(&game->am, 0.0f, 0, 0.0);
     else
         asteroids_init(&game->am, lv->gravity, lv->max_asteroids, lv->max_size);
 }

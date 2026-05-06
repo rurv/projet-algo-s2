@@ -11,7 +11,7 @@ typedef struct Level {
     int   is_boss_level;
     float gravity;
     int   max_asteroids;
-    int   max_size;
+    float   max_size;
     struct Level *next_level;
 } Level;
 

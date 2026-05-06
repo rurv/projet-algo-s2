@@ -80,7 +80,7 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
 
     // Astéroides (niveaux normaux uniquement)
     if (!game_is_boss(game))
-        asteroids_draw(b->buffer, (AsteroidManager *)&game->am);
+        asteroids_draw(*assets, b->buffer, (AsteroidManager *)&game->am);
 
     // Lasers
     for (int i = 0; i < p->laser_count; i++) {

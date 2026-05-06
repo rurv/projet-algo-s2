@@ -4,12 +4,11 @@
 #include <math.h>
 
 // Dessine un cercle marron plein (asset procédural)
-static void draw_asteroid(BITMAP *buf, int x, int y, int r) {
-    int dark  = makecol(101, 67, 33);
-    int light = makecol(139, 90, 43);
-    circlefill(buf, x, y, r,     dark);
-    circlefill(buf, x - r/4, y - r/4, r * 2 / 3, light);
-    circle(buf, x, y, r, makecol(70, 45, 20));
+static void draw_asteroid(Assets a, BITMAP *buf, int x, int y, float r) {
+    BITMAP *tmp = create_bitmap(128,128);
+    clear_to_color(tmp,makecol(255,0,255));
+    blit(a.asteroid_sprites, tmp, 0,0, 0,0, 128,128);
+    masked_stretch_blit(tmp, buf, 0,0, 128,128, x,y, (int)(r*128.0),(int)(r/128.0));
 }
 
 static int ground_y(void) {
@@ -20,8 +19,8 @@ static void spawn_one(AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (am->asteroids[i].active) continue;
         Asteroid *a = &am->asteroids[i];
-        a->radius = am->max_size / 2 + rand() % (am->max_size / 2 + 1);
-        a->x  = a->radius + rand() % (SCREEN_WIDTH  - 2 * a->radius);
+        a->radius = 1 + rand() % (int)(am->max_size);
+        a->x  = a->radius + rand() % (SCREEN_WIDTH  - 2 * (int)a->radius);
         a->y  = a->radius + rand() % (SCREEN_HEIGHT / 3);
         a->dx = (float)(rand() % 5 + 1) * (rand() % 2 ? 1 : -1);
         a->dy = (float)(rand() % 3 + 1);
@@ -32,7 +31,7 @@ static void spawn_one(AsteroidManager *am) {
     }
 }
 
-void asteroids_init(AsteroidManager *am, float gravity, int to_spawn, int max_size) {
+void asteroids_init(AsteroidManager *am, float gravity, int to_spawn, float max_size) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) am->asteroids[i].active = 0;
     am->count       = 0;
     am->spawned     = 0;
@@ -85,11 +84,11 @@ void asteroids_update(AsteroidManager *am) {
     }
 }
 
-void asteroids_draw(BITMAP *buffer, AsteroidManager *am) {
+void asteroids_draw(Assets as, BITMAP *buffer, AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         Asteroid *a = &am->asteroids[i];
         if (!a->active) continue;
-        draw_asteroid(buffer, (int)a->x, (int)a->y, a->radius);
+        draw_asteroid(as, buffer, (int)a->x, (int)a->y, a->radius);
     }
 }
 
