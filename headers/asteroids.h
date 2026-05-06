@@ -5,7 +5,7 @@
 #include "assets.h"
 
 #define MAX_ASTEROIDS   32
-#define MIN_ASTEROID_SIZE 0.5
+#define MIN_ASTEROID_SIZE 20
 
 typedef struct Asteroid {
     float x, y;
