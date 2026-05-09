@@ -35,6 +35,7 @@ typedef struct Game{
     BonusDrop bonus;
     int bonus_timer;
     TypeBonus bonus_actif;
+    int level_complete;   // 1 quand le niveau vient d'être terminé (avant transition)
 } Game;
 
 Game init_game(void);

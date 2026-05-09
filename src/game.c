@@ -76,6 +76,7 @@ Game init_game(void) {
     game.current_level = levels[0];
     game.bonus.actif = 0;
     game.bonus_timer = 0;
+    game.level_complete = 0;
 
     load_level_asteroids(&game);
     return game;
@@ -99,8 +100,8 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
         colision_laser_asteroids(player, game);
 
         // Passage automatique quand tous les astéroïdes sont détruits
-        if (asteroids_all_dead(&game->am))
-            game_next_level(game, boss);
+        if (asteroids_all_dead(&game->am) && !game->level_complete)
+            game->level_complete = 1;
     } else {
         boss_update(boss);
         colision(player, boss);
