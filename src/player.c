@@ -55,6 +55,7 @@ void player_update (Player *p) {
                 p->lasers[i].active = 0;
         }
     }
+    if (p->invincible_timer > 0) p->invincible_timer--;
 }
 
 void player_move_left (Player *p) {

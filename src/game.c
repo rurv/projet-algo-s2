@@ -86,6 +86,12 @@ void game_update(Player *player, Boss *boss, Game *game) {
     update_game_bonus(game, player);
     apply_bonus_effects(game, player);
 
+    if (player->invincible_timer <= 0 && game->bonus_timer <= 0) {
+        player->invincible = 0;
+    } else {
+        player->invincible = 1;
+    }
+
     if (!game_is_boss(game)) {
         asteroids_update(&game->am);
         colision_laser_asteroids(player, game);
@@ -166,6 +172,51 @@ void colision_laser_asteroids(Player *player, Game *game) {
         }
     }
 }
+
+void colision_asteroids_player(Player *p, AsteroidManager *am) {
+    // 1. On définit le centre et le rayon du vaisseau
+    // On centre le cercle sur le milieu du sprite (vaisseau de ~60x80)
+    float p_centerX = p->x + 30;
+    float p_centerY = p->y + 40;
+    float p_radius  = 25.0f; // Rayon de collision du vaisseau
+
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        if (am->asteroids[i].active) {
+            Asteroid *a = &am->asteroids[i];
+
+            // 2. Calcul du vecteur entre les deux centres
+            float dx = p_centerX - a->x;
+            float dy = p_centerY - a->y;
+
+            // 3. Calcul de la distance au carré : d² = dx² + dy²
+            float distance_au_carre = (dx * dx) + (dy * dy);
+
+            // 4. Somme des rayons au carré : (r1 + r2)²
+            float somme_rayons = p_radius + a->radius;
+            float seuil_collision = somme_rayons * somme_rayons;
+
+            // 5. Test de collision
+            if (distance_au_carre < seuil_collision) {
+
+                // Si pas invincible, on prend cher
+                if (!p->invincible) {
+                    p->vies--;
+
+                    // Invincibilité de sécurité (clignotement)
+                    p->invincible = 1;
+                    p->invincible_timer = 120;
+                }
+
+                // L'astéroïde explose dans tous les cas
+                a->active = 0;
+
+                // Ici tu pourrais appeler asteroid_split si tu veux des débris
+                // asteroid_split(am, i, g);
+            }
+        }
+    }
+}
+
 void update_game_bonus(Game *g, Player *p) {
     if (!g->bonus.actif) return;
 

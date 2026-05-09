@@ -125,6 +125,8 @@ int main() {
                 if (!key[KEY_SPACE]) space_pressed = 0;
                 game_update(&player, &boss, &game);
 
+                colision_asteroids_player(&player, &game.am);
+
                 if (boss.pv <= 0 && !boss_dead_sound && game_is_boss(&game)) {
                     audio_play_explode(&audio);
                     boss_dead_sound = 1;

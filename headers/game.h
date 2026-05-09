@@ -48,5 +48,6 @@ int  game_ground_height(void);
 void game_next_level(Game *game, Boss *boss);
 void apply_bonus_effects(Game *g, Player *p);
 void update_game_bonus(Game *g, Player *p);
+void colision_asteroids_player(Player *p, AsteroidManager *am);
 
 #endif
