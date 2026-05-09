@@ -28,6 +28,7 @@ void player_shot(Player *p) {
             p->lasers[i].x = p->x + 24 ; // centré sur le vaisseau
             p->lasers[i].y = p->y;
             p->lasers[i].dy = -30.0;
+            p->lasers[i].dx = 0.0;
             p->lasers[i].active = 1;
             return; // on tire un seul laser à la fois
         }
@@ -44,12 +45,13 @@ void player_update (Player *p) {
     for (int i = 0; i < p->laser_count; i++) {
         if (p->lasers[i].active) {
             p->lasers[i].y += p->lasers[i].dy;
+            p->lasers[i].x += p->lasers[i].dx;
             p->lasers[i].frame_timer++;
             if (p->lasers[i].frame_timer >= 5) {
                 p->lasers[i].frame_timer = 0;
                 p->lasers[i].frame = (p->lasers[i].frame + 1) % 4;
             }
-            if (p->lasers[i].y < 0)
+            if (p->lasers[i].y < 0 || p->lasers[i].x < 0 || p->lasers[i].x > SCREEN_W)
                 p->lasers[i].active = 0;
         }
     }

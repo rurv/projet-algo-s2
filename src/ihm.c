@@ -3,6 +3,7 @@
 //
 
 #include "../headers/ihm.h"
+#include <stdio.h>
 
 void ecrire_centre_texte(BITMAP *dest, const char *texte, int centre_x, int y, int couleur, float multiplicateur) {
     int w = text_length(font, texte);

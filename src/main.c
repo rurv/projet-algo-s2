@@ -81,13 +81,48 @@ int main() {
                 break;
 
             case JEU:
-                if (key[KEY_SPACE] && !space_pressed) {
-                    player_shot(&player);
-                    audio_play_laser(&audio);
-                    space_pressed = 1;
+                if (key[KEY_SPACE]) {
+                    if (!space_pressed) {
+                        // 1. On vérifie s'il y a déjà des lasers à l'écran
+                        int nb_actifs = 0;
+                        for (int i = 0; i < player.laser_count; i++) {
+                            if (player.lasers[i].active) nb_actifs++;
+                        }
+
+                        // 2. On ne tire QUE si l'écran est vide (Salve unique)
+                        if (nb_actifs == 0) {
+
+                            // TIR CENTRAL (Droit)
+                            player_shot(&player);
+
+                            // TIRS CÔTÉS (Diagonaux)
+                            if (game.bonus_actif == TRIPLE_LASER) {
+                                int tirs_supp = 0;
+                                for (int i = 0; i < player.laser_count && tirs_supp < 2; i++) {
+                                    if (!player.lasers[i].active) {
+                                        player.lasers[i].active = 1;
+                                        player.lasers[i].y = player.y;
+                                        player.lasers[i].dy = -25.0f;
+
+                                        if (tirs_supp == 0) {
+                                            player.lasers[i].x = player.x + 10; // Côté gauche
+                                            player.lasers[i].dx = -7.0f;        // S'écarte à gauche
+                                        } else {
+                                            player.lasers[i].x = player.x + 40; // Côté droit
+                                            player.lasers[i].dx = 7.0f;         // S'écarte à droite
+                                        }
+                                        tirs_supp++;
+                                    }
+                                }
+                            }
+                            audio_play_laser(&audio);
+                        }
+                        space_pressed = 1; // Bloque le tir continu tant qu'on ne relâche pas
+                    }
+                } else {
+                    space_pressed = 0; // Réinitialise quand on relâche la touche
                 }
                 if (!key[KEY_SPACE]) space_pressed = 0;
-
                 game_update(&player, &boss, &game);
 
                 if (boss.pv <= 0 && !boss_dead_sound && game_is_boss(&game)) {
@@ -96,6 +131,7 @@ int main() {
                 }
 
                 display(&bmps, &assets, &player, &boss, &game);
+                draw_bonus_system(bmps.buffer, &game, &assets);
                 rest(1);
 
                 break;

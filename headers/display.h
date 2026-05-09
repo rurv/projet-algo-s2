@@ -25,5 +25,6 @@ void    display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *g
 void    display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active);
 void    display_hud(Bitmaps *b, Player *p, Boss *boss, const Game *game);
 void    destroy_display(Bitmaps *b, Assets *assets);
+void    draw_bonus_system(BITMAP *buffer, Game *g, Assets *as);
 
 #endif

@@ -2,6 +2,7 @@
 #include "../headers/config.h"
 #include <stdlib.h>
 #include <math.h>
+#include "../headers/game.h"
 
 static int ground_y(void) {
     return SCREEN_HEIGHT / 5 * 4 + 84;
@@ -107,7 +108,7 @@ void asteroids_draw(Assets as, BITMAP *buffer, AsteroidManager *am) {
     }
 }
 
-void asteroid_split(AsteroidManager *am, int idx) {
+void asteroid_split(AsteroidManager *am, int idx, Game *g) {
     Asteroid *a = &am->asteroids[idx];
     if (!a->active) return;
 
@@ -136,6 +137,13 @@ void asteroid_split(AsteroidManager *am, int idx) {
             am->count++;
             break;
         }
+    }
+    if (!g->bonus.actif && (rand() % 4 == 0)) { // 25% de chance
+        g->bonus.actif = 1;
+        g->bonus.en_attente = 0;
+        g->bonus.x = save_x;
+        g->bonus.y = save_y;
+        g->bonus.type = (rand() % 2 == 0) ? TRIPLE_LASER : INVINCIBILITE;
     }
 }
 
