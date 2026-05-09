@@ -71,12 +71,13 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     if (!game_is_boss(game)) {
         int gh  = game_ground_height();
         int gy  = SCREEN_H - gh;
-        int col = ground_color_for_level(game_level_index(game));
-        rectfill(b->buffer, 0, gy, SCREEN_W - 1, SCREEN_H - 1, col);
-        int r = getr(col)+50; if(r>255)r=255;
-        int g = getg(col)+50; if(g>255)g=255;
-        int bv= getb(col)+50; if(bv>255)bv=255;
-        hline(b->buffer, 0, gy, SCREEN_W - 1, makecol(r, g, bv));
+        int idx = game_level_index(game);
+        if (idx >= 3) idx = 2;
+        // Étire le BMP sur toute la largeur et la hauteur du sol
+        stretch_blit(assets->sol_sprites[idx], b->buffer,
+                     0, 0,
+                     assets->sol_sprites[idx]->w, assets->sol_sprites[idx]->h,
+                     0, gy, SCREEN_W, gh);
     }
 
     // Astéroides (niveaux normaux uniquement)

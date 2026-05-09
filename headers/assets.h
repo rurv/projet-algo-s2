@@ -20,7 +20,10 @@ typedef struct Assets {
     BITMAP *boss;
     BITMAP *explosion1;
     BITMAP *claude;
+    BITMAP *sol_sprites[3];
 } Assets;
+
+
 
 void load_assets (Assets *a);   // chargement des assets
 void free_assets (Assets *a);   // liberation des assets

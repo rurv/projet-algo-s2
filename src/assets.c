@@ -15,12 +15,16 @@ static const char *asteroid_paths_fb[NB_ASTEROID_SPRITES] = {
     "../assets/images/sprites_asteroid3.bmp"
 };
 
+
 void load_assets (Assets *a) {
     a->player_sprites = load_bitmap("assets/images/sprites_ships.bmp", NULL);
     a->laser_sprite   = load_bitmap("assets/images/laser.bmp", NULL);
     a->boss           = load_bitmap("assets/images/boss.bmp", NULL);
     a->explosion1     = load_bitmap("assets/images/explosion1.bmp", NULL);
     a->claude         = load_bitmap("assets/images/claude.bmp", NULL);
+    a->sol_sprites[0] = load_bitmap("../assets/images/sol_lune.bmp", NULL);
+    a->sol_sprites[1] = load_bitmap("../assets/images/sol_volcan.bmp", NULL);
+    a->sol_sprites[2] = load_bitmap("../assets/images/sol_cristal.bmp", NULL);
 
     // Chargement des sprites d'astéroïdes (1 par niveau)
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
@@ -62,6 +66,20 @@ void load_assets (Assets *a) {
             allegro_exit(); exit(1);
         }
     }
+
+    if (!a->sol_sprites[0]) {
+        a->sol_sprites[0] = load_bitmap("../assets/images/sol_lune.bmp", NULL);
+        if (!a->sol_sprites[0]) { allegro_message("Erreur chargement sol_lune.bmp"); allegro_exit(); exit(1); }
+    }
+    if (!a->sol_sprites[1]) {
+        a->sol_sprites[1] = load_bitmap("../assets/images/sol_volcan.bmp", NULL);
+        if (!a->sol_sprites[1]) { allegro_message("Erreur chargement sol_volcan.bmp"); allegro_exit(); exit(1); }
+    }
+    if (!a->sol_sprites[2]) {
+        a->sol_sprites[2] = load_bitmap("../assets/images/sol_cristal.bmp", NULL);
+        if (!a->sol_sprites[2]) { allegro_message("Erreur chargement sol_cristal.bmp"); allegro_exit(); exit(1); }
+    }
+
     // Fallback pour chaque sprite d'astéroïde
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
         if (!a->asteroid_sprites[i]) {
@@ -85,4 +103,6 @@ void free_assets (Assets *a) {
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
         destroy_bitmap(a->asteroid_sprites[i]);
     }
+    for (int i = 0; i < 3; i++)
+        destroy_bitmap(a->sol_sprites[i]);
 }
