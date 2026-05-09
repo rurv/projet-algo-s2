@@ -112,6 +112,10 @@ void asteroid_split(AsteroidManager *am, int idx) {
     if (!a->active) return;
 
     float new_r = a->radius / 2.0f;
+    // Sauvegarder avant de désactiver
+    float save_x = a->x, save_y = a->y;
+    float save_dx = a->dx, save_dy = a->dy;
+
     a->active = 0;
     am->count--;
 
@@ -122,11 +126,13 @@ void asteroid_split(AsteroidManager *am, int idx) {
             if (am->asteroids[i].active) continue;
             Asteroid *b = &am->asteroids[i];
             b->radius = new_r;
-            b->x  = a->x + (frag == 0 ? -new_r : new_r);
-            b->y  = a->y;
-            b->dx = a->dx * (frag == 0 ? -1.2f : 1.2f);
-            b->dy = a->dy - 1.0f;
+            b->x  = save_x + (frag == 0 ? -new_r : new_r);
+            b->y  = save_y;
+            b->dx = save_dx * (frag == 0 ? -1.2f : 1.2f);
+            b->dy = save_dy - 1.0f;
             b->active = 1;
+            b->frame = rand() % 64;
+            b->frame_timer = 0;
             am->count++;
             break;
         }
