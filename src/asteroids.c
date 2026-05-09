@@ -8,13 +8,13 @@ static int ground_y(void) {
 }
 
 /* Dessine le sprite 128x128 centré sur (cx, cy), mis à l'échelle selon le rayon */
-static void draw_asteroid(Assets a, BITMAP *buf, float cx, float cy, float r, int frame) {
+static void draw_asteroid(BITMAP *sprite, BITMAP *buf, float cx, float cy, float r, int frame) {
     int size = (int)(r * 2);
     if (size < 2) size = 2;
 
-    if (a.asteroid_sprites) {
+    if (sprite) {
         /* Le sprite existe : on l'étire, fond magenta masqué */
-        masked_stretch_blit(a.asteroid_sprites, buf,
+        masked_stretch_blit(sprite, buf,
                         frame*128, 0, 128, 128,
                         (int)(cx - r), (int)(cy - r), size, size);
     } else {
@@ -99,11 +99,11 @@ void asteroids_update(AsteroidManager *am) {
     }
 }
 
-void asteroids_draw(Assets as, BITMAP *buffer, AsteroidManager *am) {
+void asteroids_draw(BITMAP *sprite, BITMAP *buffer, AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         Asteroid *a = &am->asteroids[i];
         if (!a->active) continue;
-        draw_asteroid(as, buffer, a->x, a->y, a->radius, a->frame);
+        draw_asteroid(sprite, buffer, a->x, a->y, a->radius, a->frame);
     }
 }
 

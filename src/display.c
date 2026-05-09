@@ -79,9 +79,14 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     }
 
     // Astéroides (niveaux normaux uniquement)
-    if (!game_is_boss(game))
-        asteroids_draw(*assets, b->buffer, (AsteroidManager *)&game->am);
-
+    // Le sprite est choisi en fonction du niveau (1->idx 0, 2->idx 1, 3->idx 2)
+    if (!game_is_boss(game)) {
+        int idx = game_level_index(game);
+        // Sécurité : si plus de niveaux que de sprites, on réutilise le dernier
+        if (idx >= NB_ASTEROID_SPRITES) idx = NB_ASTEROID_SPRITES - 1;
+        asteroids_draw(assets->asteroid_sprites[idx], b->buffer,
+                       (AsteroidManager *)&game->am);
+    }
     // Lasers
     for (int i = 0; i < p->laser_count; i++) {
         if (!p->lasers[i].active) continue;
