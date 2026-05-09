@@ -63,7 +63,7 @@ void audio_stop_boss_eclair(Audio *a) {
     stop_sample(a->boss_eclair);
 }
 void audio_play_bo(Audio *a) {
-    play_sample(a->bo_sfx, 170, 128, 1000, 0);
+    play_sample(a->bo_sfx, 170, 128, 1000, 1);
 }
 void audio_stop_bo(Audio *a) {
     stop_sample(a->bo_sfx);

@@ -161,7 +161,6 @@ int main() {
                 ATTENDRE_RELACHE();
                 quitter = 1;
                 break;
-
         }
         if (!quitter && ecran != JEU) {
             show_mouse(bmps.buffer); // Pour voir ton curseur
