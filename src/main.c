@@ -35,6 +35,7 @@ int main() {
     int space_pressed   = 0;
     int boss_dead_sound = 0;
     int s_pressed = 0;
+    int quitter =0;
 
     //Etoiles en fond
     Etoile etoiles[NOMBRE_ETOILES];
@@ -46,7 +47,7 @@ int main() {
     }
 
     //boucle
-    while (ecran != QUITTER && !key[KEY_ESC]) {
+    while (!quitter && !key[KEY_ESC]) {
 
         if (ecran != JEU) {
             // Fond étoilé
@@ -156,14 +157,18 @@ int main() {
                     ecran = MENU_PRINCIPAL; // pas de sauvegarde, on reste au menu
                 break;
 
+            case QUITTER:
+                ATTENDRE_RELACHE();
+                quitter = 1;
+                break;
+
         }
-        if (ecran != JEU) {
+        if (!quitter && ecran != JEU) {
             show_mouse(bmps.buffer); // Pour voir ton curseur
             blit(bmps.buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         }
     }
 
-    readkey();
     audio_destroy(&audio);
     destroy_display(&bmps, &assets);
     allegro_exit();

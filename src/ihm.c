@@ -9,6 +9,7 @@ void ecrire_centre_texte(BITMAP *dest, const char *texte, int centre_x, int y, i
     int w = text_length(font, texte);
     int h = text_height(font);
     BITMAP *temp = create_bitmap(w, h);
+    if (!temp) return;
     clear_to_color(temp, makecol(255, 0, 255));
     textout_ex(temp, font, texte, 0, 0, couleur, -1);
     stretch_sprite(dest, temp, centre_x - (w * multiplicateur) / 2, y, w * multiplicateur, h * multiplicateur);
@@ -69,6 +70,7 @@ enum EcranActuel menu_principale(enum EcranActuel ecran, BITMAP *buffer ) {
                                              }
         return ecran;
         }
+    return ecran;
 }
 
 
