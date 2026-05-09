@@ -88,6 +88,8 @@ void game_update(Player *player, Boss *boss, Game *game) {
 
     if (player->invincible_timer <= 0 && game->bonus_timer <= 0) {
         player->invincible = 0;
+    } else if (player->invincible_timer <= 0 && game->bonus_actif == TRIPLE_LASER) {
+        player->invincible = 0;
     } else {
         player->invincible = 1;
     }
