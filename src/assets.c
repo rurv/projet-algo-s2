@@ -11,6 +11,7 @@ void load_assets (Assets *a) {
     a->boss = load_bitmap("assets/images/boss.bmp", NULL);
     a->explosion1 = load_bitmap("assets/images/explosion1.bmp", NULL);
     a->claude = load_bitmap("assets/images/claude.bmp", NULL);
+    a->asteroid_sprites = load_bitmap("assets/images/sprites_asteroid.bmp", NULL);
 
     // if (!a->...) { ... }
     if (!a->player_sprites) {
@@ -53,6 +54,14 @@ void load_assets (Assets *a) {
             exit(1);
         }
     }
+    if (!a->asteroid_sprites) {
+        a->asteroid_sprites = load_bitmap("../assets/images/sprites_asteroid.bmp", NULL);
+        if (!a->asteroid_sprites) {
+            allegro_message("Erreur chargement sprites_asteroid.bmp", NULL);
+            allegro_exit();
+            exit(1);
+        }
+    }
 }
     void free_assets (Assets *a) {
         // destroy_bitmap(a->...);
@@ -61,4 +70,5 @@ void load_assets (Assets *a) {
         destroy_bitmap(a->boss);
         destroy_bitmap(a->explosion1);
         destroy_bitmap(a->claude);
+        destroy_bitmap(a->asteroid_sprites);
     }

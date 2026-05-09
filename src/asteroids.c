@@ -3,47 +3,69 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Dessine un cercle marron plein (asset procédural)
-static void draw_asteroid(BITMAP *buf, int x, int y, int r) {
-    int dark  = makecol(101, 67, 33);
-    int light = makecol(139, 90, 43);
-    circlefill(buf, x, y, r,     dark);
-    circlefill(buf, x - r/4, y - r/4, r * 2 / 3, light);
-    circle(buf, x, y, r, makecol(70, 45, 20));
+static int ground_y(void) {
+    return SCREEN_HEIGHT / 5 * 4 + 84;
 }
 
-static int ground_y(void) {
-    return SCREEN_HEIGHT - (SCREEN_HEIGHT - (SCREEN_HEIGHT / 5 * 4 + 84));
+/* Dessine le sprite 128x128 centré sur (cx, cy), mis à l'échelle selon le rayon */
+static void draw_asteroid(Assets a, BITMAP *buf, float cx, float cy, float r, int frame) {
+    int size = (int)(r * 2);
+    if (size < 2) size = 2;
+
+    if (a.asteroid_sprites) {
+        /* Le sprite existe : on l'étire, fond magenta masqué */
+        masked_stretch_blit(a.asteroid_sprites, buf,
+                        frame*128, 0, 128, 128,
+                        (int)(cx - r), (int)(cy - r), size, size);
+    } else {
+        /* Fallback cercle marron si sprite absent */
+        circlefill(buf, (int)cx, (int)cy, (int)r, makecol(139, 90, 43));
+        circle(buf,     (int)cx, (int)cy, (int)r, makecol(80, 50, 20));
+    }
 }
 
 static void spawn_one(AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (am->asteroids[i].active) continue;
         Asteroid *a = &am->asteroids[i];
-        a->radius = am->max_size / 2 + rand() % (am->max_size / 2 + 1);
-        a->x  = a->radius + rand() % (SCREEN_WIDTH  - 2 * a->radius);
-        a->y  = a->radius + rand() % (SCREEN_HEIGHT / 3);
-        a->dx = (float)(rand() % 5 + 1) * (rand() % 2 ? 1 : -1);
+
+        /* Rayon entre 0.5*max_size et 2*max_size */
+        float min_r = am->max_size * 0.5f;
+        float max_r = am->max_size * 2.0f;
+        a->radius = min_r + (rand() % 1000) / 1000.0f * (max_r - min_r);
+        if (a->radius < 4.0f) a->radius = 4.0f;
+
+        int margin = (int)a->radius + 1;
+        int spawn_w = SCREEN_WIDTH  - 2 * margin;
+        int spawn_h = ground_y()    / 3;
+        if (spawn_w < 1) spawn_w = 1;
+        if (spawn_h < 1) spawn_h = 1;
+
+        a->x  = margin + rand() % spawn_w;
+        a->y  = margin + rand() % spawn_h;
+        a->dx = (float)(rand() % 5 + 1) * (rand() % 2 ? 1.0f : -1.0f);
         a->dy = (float)(rand() % 3 + 1);
         a->active = 1;
+        a->frame = rand() % 64;
+        a->frame_timer = 0;
         am->spawned++;
         am->count++;
         return;
     }
 }
 
-void asteroids_init(AsteroidManager *am, float gravity, int to_spawn, int max_size) {
+void asteroids_init(AsteroidManager *am, float gravity, int to_spawn, float max_size) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) am->asteroids[i].active = 0;
     am->count       = 0;
     am->spawned     = 0;
     am->to_spawn    = to_spawn;
     am->spawn_timer = 0;
-    am->gravity     = gravity;   // pixels/s² * (1/FPS²) — appliqué chaque frame
+    am->gravity     = gravity;
     am->max_size    = max_size;
 }
 
 void asteroids_update(AsteroidManager *am) {
-    // Spawn progressif : un nouvel astéroïde toutes les ~120 frames
+    /* Spawn un astéroïde toutes les 120 frames */
     if (am->spawned < am->to_spawn) {
         am->spawn_timer++;
         if (am->spawn_timer >= 120) {
@@ -52,9 +74,8 @@ void asteroids_update(AsteroidManager *am) {
         }
     }
 
-    float g = am->gravity / (60.0f * 60.0f); // converti en px/frame²
-
-    int gy = ground_y();
+    float g  = am->gravity / (60.0f * 60.0f);
+    int   gy = ground_y();
 
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         Asteroid *a = &am->asteroids[i];
@@ -64,32 +85,25 @@ void asteroids_update(AsteroidManager *am) {
         a->x  += a->dx;
         a->y  += a->dy;
 
-        // Rebond sol (élastique parfait, pas de frottement)
-        if (a->y + a->radius >= gy) {
-            a->y  = gy - a->radius;
-            a->dy = -a->dy;
+        a->frame_timer++;
+        if (a->frame_timer >= 4) {
+            a->frame_timer = 0;
+            a->frame = (a->frame + 1) % 64;
         }
-        // Rebond bords latéraux
-        if (a->x - a->radius <= 0) {
-            a->x  = a->radius;
-            a->dx = -a->dx;
-        } else if (a->x + a->radius >= SCREEN_WIDTH) {
-            a->x  = SCREEN_WIDTH - a->radius;
-            a->dx = -a->dx;
-        }
-        // Rebond plafond
-        if (a->y - a->radius <= 0) {
-            a->y  = a->radius;
-            a->dy = -a->dy;
-        }
+
+        /* Rebonds */
+        if (a->y + a->radius >= gy)                { a->y = gy - a->radius;           a->dy = -a->dy; }
+        if (a->x - a->radius <= 0)                 { a->x = a->radius;                a->dx = -a->dx; }
+        else if (a->x + a->radius >= SCREEN_WIDTH) { a->x = SCREEN_WIDTH - a->radius; a->dx = -a->dx; }
+        if (a->y - a->radius <= 0)                 { a->y = a->radius;                a->dy = -a->dy; }
     }
 }
 
-void asteroids_draw(BITMAP *buffer, AsteroidManager *am) {
+void asteroids_draw(Assets as, BITMAP *buffer, AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         Asteroid *a = &am->asteroids[i];
         if (!a->active) continue;
-        draw_asteroid(buffer, (int)a->x, (int)a->y, a->radius);
+        draw_asteroid(as, buffer, a->x, a->y, a->radius, a->frame);
     }
 }
 
@@ -97,13 +111,12 @@ void asteroid_split(AsteroidManager *am, int idx) {
     Asteroid *a = &am->asteroids[idx];
     if (!a->active) return;
 
-    int new_r = a->radius / 2;
+    float new_r = a->radius / 2.0f;
     a->active = 0;
     am->count--;
 
-    if (new_r < MIN_ASTEROID_SIZE) return; // trop petit, disparait
+    if (new_r < MIN_ASTEROID_SIZE) return;
 
-    // Crée deux fragments
     for (int frag = 0; frag < 2; frag++) {
         for (int i = 0; i < MAX_ASTEROIDS; i++) {
             if (am->asteroids[i].active) continue;
