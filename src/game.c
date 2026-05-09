@@ -74,6 +74,8 @@ Game init_game(void) {
     game.levels        = levels;
     game.nlevels       = nlevels;
     game.current_level = levels[0];
+    game.bonus.actif = 0;
+    game.bonus_timer = 0;
 
     load_level_asteroids(&game);
     return game;
@@ -81,6 +83,8 @@ Game init_game(void) {
 
 void game_update(Player *player, Boss *boss, Game *game) {
     player_update(player);
+    update_game_bonus(game, player);
+    apply_bonus_effects(game, player);
 
     if (!game_is_boss(game)) {
         asteroids_update(&game->am);
@@ -156,9 +160,69 @@ void colision_laser_asteroids(Player *player, Game *game) {
             float r = am->asteroids[a].radius;
             if (dist2 <= r * r) {
                 player->lasers[l].active = 0;
-                asteroid_split(am, a);
+                asteroid_split(am, a, game);
                 break;
             }
         }
+    }
+}
+void update_game_bonus(Game *g, Player *p) {
+    if (!g->bonus.actif) return;
+
+    // 1. Descente de la boule style Neon
+    if (!g->bonus.en_attente) {
+        g->bonus.y += 3.0f; // Vitesse de descente
+        if (g->bonus.y >= p->y+60) {
+            g->bonus.y = p->y+60;
+            g->bonus.en_attente = 1;
+            g->bonus.timer_vie = 180; // 3 secondes à 60 FPS
+        }
+    } else {
+        // 2. Attente de 3 secondes au niveau du vaisseau
+        g->bonus.timer_vie--;
+        if (g->bonus.timer_vie <= 0) g->bonus.actif = 0;
+    }
+
+    // 3. Collision avec le vaisseau pour ramasser
+    float dist_x = abs(g->bonus.x - (p->x + 30)); // 30 = milieu du vaisseau
+    float dist_y = abs(g->bonus.y - (p->y + 30));
+    if (dist_x < 50 && dist_y < 50) {
+        g->bonus_actif = g->bonus.type;
+        if (g->bonus_actif == INVINCIBILITE) {
+            p->invincible = 1;
+            g->bonus_timer = 600;        // Le bonus dure 10 secondes
+        }
+        if (g->bonus_actif == TRIPLE_LASER) {
+            g->bonus_timer = 200;
+        }
+        g->bonus.actif = 0;
+
+    }
+}
+
+void apply_bonus_effects(Game *g, Player *p) {
+    if (g->bonus_timer > 0) {
+        g->bonus_timer--;
+
+        // Effet Triple Laser (à appeler quand on appuie sur Espace)
+        // Note : Cette logique est à insérer dans ta fonction player_shot ou ici
+        if (g->bonus_actif == TRIPLE_LASER && key[KEY_SPACE]) {
+            // On force le tir diagonal en modifiant les lasers libres
+            int tirs_faits = 0;
+            for (int i = 0; i < p->laser_count && tirs_faits < 2; i++) {
+                if (!p->lasers[i].active) {
+                    p->lasers[i].x = p->x + 24;
+                    p->lasers[i].y = p->y;
+                    p->lasers[i].dy = -25.0f;
+                    p->lasers[i].dx = (tirs_faits == 0) ? -5.0f : 5.0f; // Diagonales
+                    p->lasers[i].active = 1;
+                    tirs_faits++;
+                }
+            }
+        }
+    } else {
+        // Fin des bonus
+        if (g->bonus_actif == INVINCIBILITE) p->invincible = 0;
+        g->bonus_actif = AUCUN_BONUS;
     }
 }

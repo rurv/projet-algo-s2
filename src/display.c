@@ -1,5 +1,6 @@
 #include "../headers/display.h"
 #include "../headers/asteroids.h"
+#include <stdio.h>
 
 static int ground_color_for_level(int idx) {
     switch (idx) {
@@ -101,8 +102,8 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     switch(p->skin_id) {
         case VAISSEAU1: skin_x = 152; skin_y = 336; skin_w = 48; skin_h = 64; break;
         case VAISSEAU2: skin_x = 208; skin_y = 328; skin_w = 47; skin_h = 63; break;
-        case VAISSEAU3: skin_x = 64; skin_y = 336; skin_w = 48; skin_h = 64;break;
-        case VAISSEAU4: skin_x = 296; skin_y = 336; skin_w = 48; skin_h = 64;break;
+        case VAISSEAU3: skin_x = 64; skin_y = 368; skin_w = 47; skin_h = 40;break;
+        case VAISSEAU4: skin_x = 136; skin_y = 416; skin_w = 47; skin_h = 31;break;
     }
 
     BITMAP *sub = create_sub_bitmap(assets->player_sprites, skin_x, skin_y,skin_w, skin_h);
@@ -137,6 +138,8 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
 
     // Libellé niveau
     draw_level_label(b->buffer, game);
+
+    draw_bonus_system(b->buffer, (Game *)game, assets);
 
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
@@ -203,6 +206,44 @@ void display_hud(Bitmaps *b, Player *p, Boss *boss, const Game *game) {
         for(int i=3;i<=7; i++) putpixel(b->buffer,hx+i,hy+7,col);
         for(int i=4;i<=6; i++) putpixel(b->buffer,hx+i,hy+8,col);
         putpixel(b->buffer,hx+5,hy+9,col);
+    }
+}
+
+void draw_bonus_system(BITMAP *buffer, Game *g, Assets *as) {
+    // 1. Dessiner la boule Neon si active
+    if (g->bonus.actif) {
+        int col = (g->bonus.type == INVINCIBILITE) ? makecol(255, 255, 0) : makecol(0, 255, 255);
+        for (int r = 1; r < 12; r++) { // Effet Glow
+            circle(buffer, g->bonus.x, g->bonus.y, 8 + r, col);
+        }
+        circlefill(buffer, g->bonus.x, g->bonus.y, 8, makecol(255, 255, 255));
+    }
+
+    // 2. Barre de HUD pour le temps restant
+    if (g->bonus_timer > 0) {
+        // 1. On définit la durée max selon le bonus pour que la barre soit toujours pleine au début
+        int duree_max = (g->bonus_actif == INVINCIBILITE) ? 600 : 200;
+
+        // 2. Calcul de la largeur (ici 150 pixels de large pour que ça tienne bien à droite)
+        int largeur_max_barre = 150;
+        int largeur_actuelle = (g->bonus_timer * largeur_max_barre) / duree_max;
+
+        // 3. Choix de la couleur
+        int col_barre = (g->bonus_actif == INVINCIBILITE) ? makecol(255, 215, 0) : makecol(0, 191, 255);
+
+        // 4. Coordonnées en haut à droite (sous les cœurs)
+        // On se base sur SCREEN_W - marge
+        int posX = SCREEN_W - 170; // Position de début de la barre
+        int posY = 45;             // Juste en dessous des cœurs (qui sont souvent à y=10 ou 20)
+
+        // Dessin du contour (en blanc)
+        rect(buffer, posX - 1, posY - 1, posX + largeur_max_barre + 1, posY + 11, makecol(255, 255, 255));
+
+        // Dessin de la barre de remplissage
+        rectfill(buffer, posX, posY, posX + largeur_actuelle, posY + 10, col_barre);
+
+        // Petit texte descriptif à gauche de la barre ou au-dessus
+        textout_right_ex(buffer, font, "BONUS:", posX - 10, posY + 2, makecol(255, 255, 255), -1);
     }
 }
 

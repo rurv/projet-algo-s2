@@ -12,7 +12,7 @@
 
 typedef struct Laser {
     float x, y;
-    float dy;
+    float dy, dx;
     int active;
     int frame;
     int frame_timer;
