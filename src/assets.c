@@ -22,9 +22,9 @@ void load_assets (Assets *a) {
     a->boss           = load_bitmap("assets/images/boss.bmp", NULL);
     a->explosion1     = load_bitmap("assets/images/explosion1.bmp", NULL);
     a->claude         = load_bitmap("assets/images/claude.bmp", NULL);
-    a->sol_sprites[0] = load_bitmap("../assets/images/sol_lune.bmp", NULL);
-    a->sol_sprites[1] = load_bitmap("../assets/images/sol_cristal.bmp", NULL);
-    a->sol_sprites[2] = load_bitmap("../assets/images/sol_volcan.bmp", NULL);
+    a->sol_sprites[0] = load_bitmap("assets/images/sol_lune.bmp", NULL);
+    a->sol_sprites[1] = load_bitmap("assets/images/sol_cristal.bmp", NULL);
+    a->sol_sprites[2] = load_bitmap("assets/images/sol_volcan.bmp", NULL);
 
     // Chargement des sprites d'astéroïdes (1 par niveau)
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
