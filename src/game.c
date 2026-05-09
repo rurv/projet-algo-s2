@@ -209,9 +209,7 @@ void colision_asteroids_player(Player *p, AsteroidManager *am) {
 
                 // L'astéroïde explose dans tous les cas
                 a->active = 0;
-
-                // Ici tu pourrais appeler asteroid_split si tu veux des débris
-                // asteroid_split(am, i, g);
+                am->count--;
             }
         }
     }
@@ -245,6 +243,7 @@ void update_game_bonus(Game *g, Player *p) {
         }
         if (g->bonus_actif == TRIPLE_LASER) {
             g->bonus_timer = 200;
+            p->invincible = 0;
         }
         g->bonus.actif = 0;
 

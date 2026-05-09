@@ -110,6 +110,14 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
     destroy_bitmap(sub);
 
+    if (p->invincible) {
+        // Effet de clignotement rapide pour le côté "énergie"
+        // On dessine le cercle seulement 2 images sur 3
+        if (retrace_count % 3 != 0) {
+            draw_neon_circle(b->buffer, p->x, p->y, 45);
+        }
+    }
+
     // Boss (niveau boss uniquement)
     if (game_is_boss(game) && boss->active)
         masked_blit(assets->boss, b->buffer, 0, 0, boss->x, boss->y, SCREEN_W, SCREEN_H);
@@ -253,4 +261,24 @@ void destroy_display(Bitmaps *b, Assets *assets) {
     destroy_bitmap(b->fond);
     destroy_bitmap(b->ship);
     destroy_bitmap(b->asteroid);
+}
+
+void draw_neon_circle(BITMAP *dest, int x, int y, int radius) {
+    // On centre sur le vaisseau (60x84)
+    int cx = x + 30;
+    int cy = y + 42;
+
+    // 1. Le cœur du néon (très brillant, presque blanc)
+    circle(dest, cx, cy, radius,     makecol(255, 255, 200));
+    circle(dest, cx, cy, radius - 1, makecol(255, 255, 150));
+
+    // 2. Le "Glow" (halos extérieurs)
+    // On dessine des cercles de plus en plus grands et de plus en plus sombres
+    circle(dest, cx, cy, radius + 1, makecol(220, 220, 0));
+    circle(dest, cx, cy, radius + 2, makecol(180, 180, 0));
+    circle(dest, cx, cy, radius + 3, makecol(130, 130, 0));
+    circle(dest, cx, cy, radius + 4, makecol(80, 80, 0));
+
+    // 3. Un petit éclat interne
+    circle(dest, cx, cy, radius - 2, makecol(200, 200, 0));
 }
