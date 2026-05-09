@@ -19,7 +19,7 @@ int main() {
 
     Boss boss;
     boss_init(&boss);
-    boss.active = 0; // inactif jusqu'au niveau boss
+    boss.active = 0;
 
     Audio audio;
     audio_init(&audio);
@@ -35,9 +35,8 @@ int main() {
     int space_pressed   = 0;
     int boss_dead_sound = 0;
     int s_pressed = 0;
-    int quitter =0;
+    int quitter = 0;
 
-    //Etoiles en fond
     Etoile etoiles[NOMBRE_ETOILES];
     for (int i = 0; i < NOMBRE_ETOILES; i++) {
         etoiles[i].x = rand() % SCREEN_WIDTH;
@@ -46,11 +45,9 @@ int main() {
         etoiles[i].luminosite = 100 + (rand() % 155);
     }
 
-    //boucle
     while (!quitter && !key[KEY_ESC]) {
 
         if (ecran != JEU) {
-            // Fond étoilé
             clear_to_color(bmps.buffer, makecol(10, 10, 20));
             for (int i = 0; i < NOMBRE_ETOILES; i++) {
                 etoiles[i].y += etoiles[i].vitesse;
@@ -65,11 +62,11 @@ int main() {
 
         switch (ecran) {
             case MENU_PRINCIPAL:
-                ecran = menu_principale(ecran, bmps.buffer );
+                ecran = menu_principale(ecran, bmps.buffer);
                 break;
 
             case SAISIE_PSEUDO:
-                ecran = saisie_pseudo(ecran, bmps.buffer, &player );
+                ecran = saisie_pseudo(ecran, bmps.buffer, &player);
                 break;
 
             case REGLE:
@@ -77,7 +74,7 @@ int main() {
                 break;
 
             case CHOIX:
-                ecran = choix(ecran, bmps.buffer,&assets, &player);
+                ecran = choix(ecran, bmps.buffer, &assets, &player);
                 break;
 
             case DECOMPTE:
@@ -85,7 +82,11 @@ int main() {
                 break;
 
             case JEU:
-
+                // Détection game over
+                if (player.vies <= 0) {
+                    ecran = GAME_OVER;
+                    break;
+                }
 
                 if (key[KEY_S] && !s_pressed) {
                     save_game(&player, &game);
@@ -95,33 +96,25 @@ int main() {
 
                 if (key[KEY_SPACE]) {
                     if (!space_pressed) {
-                        // 1. On vérifie s'il y a déjà des lasers à l'écran
                         int nb_actifs = 0;
-                        for (int i = 0; i < player.laser_count; i++) {
+                        for (int i = 0; i < player.laser_count; i++)
                             if (player.lasers[i].active) nb_actifs++;
-                        }
 
-                        // 2. On ne tire QUE si l'écran est vide (Salve unique)
                         if (nb_actifs == 0) {
-
-                            // TIR CENTRAL (Droit)
                             player_shot(&player);
-
-                            // TIRS CÔTÉS (Diagonaux)
                             if (game.bonus_actif == TRIPLE_LASER) {
                                 int tirs_supp = 0;
                                 for (int i = 0; i < player.laser_count && tirs_supp < 2; i++) {
                                     if (!player.lasers[i].active) {
                                         player.lasers[i].active = 1;
-                                        player.lasers[i].y = player.y;
+                                        player.lasers[i].y  = player.y;
                                         player.lasers[i].dy = -25.0f;
-
                                         if (tirs_supp == 0) {
-                                            player.lasers[i].x = player.x + 10; // Côté gauche
-                                            player.lasers[i].dx = -7.0f;        // S'écarte à gauche
+                                            player.lasers[i].x  = player.x + 10;
+                                            player.lasers[i].dx = -7.0f;
                                         } else {
-                                            player.lasers[i].x = player.x + 40; // Côté droit
-                                            player.lasers[i].dx = 7.0f;         // S'écarte à droite
+                                            player.lasers[i].x  = player.x + 40;
+                                            player.lasers[i].dx =  7.0f;
                                         }
                                         tirs_supp++;
                                     }
@@ -129,14 +122,13 @@ int main() {
                             }
                             audio_play_laser(&audio);
                         }
-                        space_pressed = 1; // Bloque le tir continu tant qu'on ne relâche pas
+                        space_pressed = 1;
                     }
                 } else {
-                    space_pressed = 0; // Réinitialise quand on relâche la touche
+                    space_pressed = 0;
                 }
-                if (!key[KEY_SPACE]) space_pressed = 0;
-                game_update(&player, &boss, &game, &audio);
 
+                game_update(&player, &boss, &game, &audio);
                 colision_asteroids_player(&player, &game.am, &audio);
 
                 if (boss.pv <= 0 && !boss_dead_sound && game_is_boss(&game)) {
@@ -147,14 +139,26 @@ int main() {
                 display(&bmps, &assets, &player, &boss, &game);
                 draw_bonus_system(bmps.buffer, &game, &assets);
                 rest(1);
-
                 break;
 
             case REPRENDRE:
                 if (load_game(&player, &game, &boss))
                     ecran = JEU;
                 else
-                    ecran = MENU_PRINCIPAL; // pas de sauvegarde, on reste au menu
+                    ecran = MENU_PRINCIPAL;
+                break;
+
+            case GAME_OVER:
+                ecran = game_over_screen(ecran, bmps.buffer, &player);
+                if (ecran == CHOIX) {
+                    // Réinitialisation complète pour une nouvelle partie
+                    player_init(&player);
+                    boss_init(&boss);
+                    boss.active     = 0;
+                    game            = init_game();
+                    boss_dead_sound = 0;
+                    save_delete();
+                }
                 break;
 
             case QUITTER:
@@ -162,8 +166,9 @@ int main() {
                 quitter = 1;
                 break;
         }
+
         if (!quitter && ecran != JEU) {
-            show_mouse(bmps.buffer); // Pour voir ton curseur
+            show_mouse(bmps.buffer);
             blit(bmps.buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         }
     }

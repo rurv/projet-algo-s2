@@ -309,3 +309,47 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
         }
     return ecran;
 }
+
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p) {
+    // Titre "GAME OVER"
+    ecrire_centre_texte(buffer, "GAME OVER", SCREEN_WIDTH / 2, LY(0.15), makecol(220, 30, 30), 9);
+
+    // Sous-titre avec le pseudo
+    char msg[40];
+    snprintf(msg, sizeof(msg), "Vous avez echoue, %s...", p->pseudo);
+    ecrire_centre_texte(buffer, msg, SCREEN_WIDTH / 2, LY(0.35), makecol(200, 200, 200), 2);
+
+    // Bouton "Rejouer"
+    rectfill(buffer, LX(0.3125), LY(0.50), LX(0.6875), LY(0.58), makecol(40, 80, 40));
+    ecrire_centre_texte(buffer, "Rejouer", SCREEN_WIDTH / 2, LY(0.52), makecol(255, 255, 255), 4);
+
+    // Bouton "Menu principal"
+    rectfill(buffer, LX(0.3125), LY(0.63), LX(0.6875), LY(0.71), makecol(30, 30, 50));
+    ecrire_centre_texte(buffer, "Menu principal", SCREEN_WIDTH / 2, LY(0.65), makecol(200, 200, 200), 4);
+
+    // Bouton "Quitter"
+    rectfill(buffer, LX(0.3125), LY(0.76), LX(0.6875), LY(0.81), makecol(50, 20, 20));
+    ecrire_centre_texte(buffer, "Quitter", SCREEN_WIDTH / 2, LY(0.775), makecol(200, 200, 200), 4);
+
+    if (mouse_b & 1) {
+        // Rejouer → on repart au choix de vaisseau (réinitialise la partie)
+        if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+            mouse_y > LY(0.50)   && mouse_y < LY(0.58)) {
+            ATTENDRE_RELACHE();
+            return CHOIX;
+
+            // Menu principal
+            } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                       mouse_y > LY(0.63)   && mouse_y < LY(0.71)) {
+                ATTENDRE_RELACHE();
+                return MENU_PRINCIPAL;
+
+                // Quitter
+                       } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                                  mouse_y > LY(0.76)   && mouse_y < LY(0.81)) {
+                           ATTENDRE_RELACHE();
+                           return QUITTER;
+                                  }
+    }
+    return ecran;
+}

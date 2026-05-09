@@ -11,7 +11,7 @@
 #include "display.h"
 #include "player.h"
 
-enum EcranActuel { MENU_PRINCIPAL, SAISIE_PSEUDO, REGLE, DECOMPTE, CHOIX, JEU, REPRENDRE, QUITTER };
+enum EcranActuel { MENU_PRINCIPAL, SAISIE_PSEUDO, REGLE, DECOMPTE, CHOIX, JEU, REPRENDRE, QUITTER, GAME_OVER };
 enum DiferrentDecompte {DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN};
 
 // Macros pratiques pour convertir des pourcentages en pixels
@@ -53,6 +53,7 @@ enum EcranActuel saisie_pseudo(enum EcranActuel ecran, BITMAP *buffer, Player *p
 enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer,Assets *assets, Player *p);
 enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 
 
 
