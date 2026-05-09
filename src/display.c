@@ -91,7 +91,16 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     }
 
     // Vaisseau joueur
-    BITMAP *sub = create_sub_bitmap(assets->player_sprites, 152, 336, 48, 64);
+    int skin_x = 0, skin_y = 0, skin_w = 0, skin_h = 0;
+
+    switch(p->skin_id) {
+        case VAISSEAU1: skin_x = 152; skin_y = 336; skin_w = 48; skin_h = 64; break;
+        case VAISSEAU2: skin_x = 208; skin_y = 328; skin_w = 47; skin_h = 63; break;
+        case VAISSEAU3: skin_x = 64; skin_y = 336; skin_w = 48; skin_h = 64;break;
+        case VAISSEAU4: skin_x = 296; skin_y = 336; skin_w = 48; skin_h = 64;break;
+    }
+
+    BITMAP *sub = create_sub_bitmap(assets->player_sprites, skin_x, skin_y,skin_w, skin_h);
     stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
     destroy_bitmap(sub);
 

@@ -29,6 +29,7 @@ typedef struct Player {
     int skin_id;
     Laser *lasers;
     int laser_count;
+    char pseudo[20];
 } Player;
 
 void player_init (Player *p);

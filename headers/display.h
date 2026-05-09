@@ -7,6 +7,9 @@
 #include "player.h"
 #include "boss.h"
 #include "game.h"
+#include "ihm.h"
+
+enum SkinActuelle {VAISSEAU1,VAISSEAU2,VAISSEAU3,VAISSEAU4};
 
 typedef struct Bitmaps {
     BITMAP *buffer;
@@ -14,7 +17,7 @@ typedef struct Bitmaps {
     BITMAP *fond;
     BITMAP *asteroid;
     float   fond_scroll_x;
-} Bitmaps;
+}Bitmaps;
 
 void    initialisation_allegro(void);
 void    init_display(Bitmaps *b, Assets *assets);
