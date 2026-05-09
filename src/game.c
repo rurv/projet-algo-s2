@@ -244,6 +244,7 @@ void update_game_bonus(Game *g, Player *p) {
         if (g->bonus_actif == TRIPLE_LASER) {
             g->bonus_timer = 200;
             p->invincible = 0;
+            p->invincible_timer = 0;
         }
         g->bonus.actif = 0;
 

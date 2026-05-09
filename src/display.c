@@ -106,17 +106,28 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
         case VAISSEAU4: skin_x = 136; skin_y = 416; skin_w = 47; skin_h = 31;break;
     }
 
-    BITMAP *sub = create_sub_bitmap(assets->player_sprites, skin_x, skin_y,skin_w, skin_h);
-    stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
-    destroy_bitmap(sub);
+    // --- DESSIN DU VAISSEAU ---
+    int afficher = 1;
 
     if (p->invincible) {
-        // Effet de clignotement rapide pour le côté "énergie"
-        // On dessine le cercle seulement 2 images sur 3
-        if (retrace_count % 3 != 0) {
-            draw_neon_circle(b->buffer, p->x, p->y, 45);
+        // CONDITION CRUCIALE : On ne clignote que si le timer de dégât est actif
+        // Si c'est un bonus (invincible = 1 mais timer = 0), on n'entre pas ici
+        if (p->invincible_timer > 0) {
+            if (p->invincible_timer % 10 < 5) {
+                afficher = 0;
+            }
         }
     }
+
+    if (afficher) {
+        // Ton code stretch_sprite habituel ici
+        BITMAP *sub = create_sub_bitmap(assets->player_sprites, skin_x, skin_y, skin_w, skin_h);
+        stretch_sprite(b->buffer, sub, p->x, p->y, 60, 84);
+        destroy_bitmap(sub);
+    }
+
+    if (p->invincible)  draw_neon_circle(b->buffer, p->x, p->y, 45);
+
 
     // Boss (niveau boss uniquement)
     if (game_is_boss(game) && boss->active)
