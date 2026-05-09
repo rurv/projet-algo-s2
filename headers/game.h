@@ -5,6 +5,7 @@
 #include "player.h"
 #include "boss.h"
 #include "asteroids.h"
+#include "audio.h"
 
 typedef enum { AUCUN_BONUS, TRIPLE_LASER, INVINCIBILITE } TypeBonus;
 
@@ -37,7 +38,7 @@ typedef struct Game{
 } Game;
 
 Game init_game(void);
-void game_update(Player *player, Boss *boss, Game *game);
+void game_update(Player *player, Boss *boss, Game *game, Audio *audio);
 void colision(Player *player, Boss *boss);
 void colision_eclair(Player *player, Boss *boss);
 void colision_laser_asteroids(Player *player, Game *game);
@@ -48,6 +49,6 @@ int  game_ground_height(void);
 void game_next_level(Game *game, Boss *boss);
 void apply_bonus_effects(Game *g, Player *p);
 void update_game_bonus(Game *g, Player *p);
-void colision_asteroids_player(Player *p, AsteroidManager *am);
+void colision_asteroids_player(Player *p, AsteroidManager *am, Audio *audio);
 
 #endif

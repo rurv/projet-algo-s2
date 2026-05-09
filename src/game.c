@@ -81,7 +81,7 @@ Game init_game(void) {
     return game;
 }
 
-void game_update(Player *player, Boss *boss, Game *game) {
+void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
     player_update(player);
     update_game_bonus(game, player);
     apply_bonus_effects(game, player);
@@ -105,6 +105,26 @@ void game_update(Player *player, Boss *boss, Game *game) {
         boss_update(boss);
         colision(player, boss);
         colision_eclair(player, boss);
+
+        static int eclair_jouait = 0;
+
+        if (boss->eclair_active) {
+            if (!eclair_jouait) {
+                audio_play_boss_eclair(audio);
+                eclair_jouait = 1;
+            }
+        } else {
+            if (eclair_jouait) {
+                audio_stop_boss_eclair(audio);
+                eclair_jouait = 0;
+            }
+        }
+        if (boss->pv <= 0) {
+            if (eclair_jouait) {
+                audio_stop_boss_eclair(audio);
+                eclair_jouait = 0;
+            }
+        }
     }
 
     if (key[KEY_LEFT])  player_move_left(player);
@@ -175,7 +195,7 @@ void colision_laser_asteroids(Player *player, Game *game) {
     }
 }
 
-void colision_asteroids_player(Player *p, AsteroidManager *am) {
+void colision_asteroids_player(Player *p, AsteroidManager *am, Audio *audio) {
     // 1. On définit le centre et le rayon du vaisseau
     // On centre le cercle sur le milieu du sprite (vaisseau de ~60x80)
     float p_centerX = p->x + 30;
@@ -203,7 +223,7 @@ void colision_asteroids_player(Player *p, AsteroidManager *am) {
                 // Si pas invincible, on prend cher
                 if (!p->invincible) {
                     p->vies--;
-
+                    audio_play_hit(audio);
                     // Invincibilité de sécurité (clignotement)
                     p->invincible = 1;
                     p->invincible_timer = 120;

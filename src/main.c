@@ -23,6 +23,7 @@ int main() {
 
     Audio audio;
     audio_init(&audio);
+    audio_play_bo(&audio);
 
     Game game = init_game();
     enum EcranActuel ecran = MENU_PRINCIPAL;
@@ -133,9 +134,9 @@ int main() {
                     space_pressed = 0; // Réinitialise quand on relâche la touche
                 }
                 if (!key[KEY_SPACE]) space_pressed = 0;
-                game_update(&player, &boss, &game);
+                game_update(&player, &boss, &game, &audio);
 
-                colision_asteroids_player(&player, &game.am);
+                colision_asteroids_player(&player, &game.am, &audio);
 
                 if (boss.pv <= 0 && !boss_dead_sound && game_is_boss(&game)) {
                     audio_play_explode(&audio);
