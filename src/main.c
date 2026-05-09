@@ -7,6 +7,7 @@
 #include "../headers/game.h"
 #include "../headers/audio.h"
 #include "../headers/ihm.h"
+#include "../headers/save.h"
 
 int main() {
     Bitmaps bmps;
@@ -32,6 +33,7 @@ int main() {
     srand(time(NULL));
     int space_pressed   = 0;
     int boss_dead_sound = 0;
+    int s_pressed = 0;
 
     //Etoiles en fond
     Etoile etoiles[NOMBRE_ETOILES];
@@ -81,6 +83,14 @@ int main() {
                 break;
 
             case JEU:
+
+
+                if (key[KEY_S] && !s_pressed) {
+                    save_game(&player, &game);
+                    s_pressed = 1;
+                }
+                if (!key[KEY_S]) s_pressed = 0;
+
                 if (key[KEY_SPACE]) {
                     if (!space_pressed) {
                         // 1. On vérifie s'il y a déjà des lasers à l'écran
@@ -139,6 +149,10 @@ int main() {
                 break;
 
             case REPRENDRE:
+                if (load_game(&player, &game, &boss))
+                    ecran = JEU;
+                else
+                    ecran = MENU_PRINCIPAL; // pas de sauvegarde, on reste au menu
                 break;
 
         }
