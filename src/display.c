@@ -294,3 +294,202 @@ void draw_neon_circle(BITMAP *dest, int x, int y, int radius) {
     // 3. Un petit éclat interne
     circle(dest, cx, cy, radius - 2, makecol(200, 200, 0));
 }
+
+// ── Helpers privés ────────────────────────────────────────────────────────────
+
+static void sync_fond_with_etoiles(BITMAP *fond, Etoile *etoiles, int n) {
+    clear_to_color(fond, makecol(255, 0, 255));
+    for (int i = 0; i < n; i++) {
+        int gris = etoiles[i].luminosite;
+        if (etoiles[i].x + 1 < fond->w && etoiles[i].y + 1 < fond->h) {
+            putpixel(fond, etoiles[i].x,     etoiles[i].y,     makecol(gris, gris, gris));
+            putpixel(fond, etoiles[i].x + 1, etoiles[i].y,     makecol(gris, gris, gris));
+            putpixel(fond, etoiles[i].x,     etoiles[i].y + 1, makecol(gris, gris, gris));
+            putpixel(fond, etoiles[i].x + 1, etoiles[i].y + 1, makecol(gris, gris, gris));
+        }
+    }
+}
+
+static void draw_player_ship(BITMAP *dest, Player *p, Assets *assets) {
+    int skin_x = 0, skin_y = 0, skin_w = 0, skin_h = 0;
+    switch (p->skin_id) {
+        case VAISSEAU1: skin_x=152; skin_y=336; skin_w=48; skin_h=64; break;
+        case VAISSEAU2: skin_x=208; skin_y=328; skin_w=47; skin_h=63; break;
+        case VAISSEAU3: skin_x= 64; skin_y=368; skin_w=47; skin_h=40; break;
+        case VAISSEAU4: skin_x=136; skin_y=416; skin_w=47; skin_h=31; break;
+    }
+    BITMAP *sub = create_sub_bitmap(assets->player_sprites, skin_x, skin_y, skin_w, skin_h);
+    if (sub) {
+        stretch_sprite(dest, sub, (int)p->x, (int)p->y, 60, 84);
+        destroy_bitmap(sub);
+    }
+}
+
+// ── API publique de la cinématique ────────────────────────────────────────────
+
+void transition_reset(Transition *tr) {
+    tr->phase        = TRANS_INACTIVE;
+    tr->timer        = 0;
+    tr->star_speed   = 1.0f;
+    tr->sol_offset   = 0.0f;
+    tr->ship_anim_y  = 0.0f;
+    tr->level_changed = 0;
+}
+
+void transition_start(Transition *tr) {
+    tr->phase        = TRANS_CENTER;
+    tr->timer        = 0;
+    tr->star_speed   = 1.0f;
+    tr->sol_offset   = 0.0f;
+    tr->level_changed = 0;
+}
+
+// Met à jour les étoiles selon la vitesse de la cinématique.
+// À appeler chaque frame quand la transition est active.
+void transition_update_etoiles(Transition *tr, Etoile *etoiles, int n_etoiles) {
+    for (int i = 0; i < n_etoiles; i++) {
+        int dy = (tr->phase != TRANS_INACTIVE)
+                 ? (int)(etoiles[i].vitesse * tr->star_speed)
+                 : etoiles[i].vitesse;
+        etoiles[i].y += dy;
+        if (etoiles[i].y >= SCREEN_HEIGHT) {
+            etoiles[i].y = 0;
+            etoiles[i].x = rand() % SCREEN_WIDTH;
+        }
+    }
+}
+
+// Avance la machine à états de la cinématique d'une frame.
+// Retourne 1 tant que la cinématique est active, 0 quand elle est terminée.
+int transition_update(Transition *tr, Player *p, Game *game, Boss *boss,
+                      int *boss_dead_sound, float player_game_y) {
+    if (tr->phase == TRANS_INACTIVE) return 0;
+
+    if (tr->phase == TRANS_CENTER) {
+        tr->timer++;
+        float t    = (float)tr->timer / TRANS_CENTER_DUR;
+        if (t > 1.0f) t = 1.0f;
+        float ease = 1.0f - (1.0f - t) * (1.0f - t);
+        float target_x = (float)(SCREEN_W / 2 - 30);
+        p->x  = p->x + (target_x - p->x) * ease;
+        p->dx = 0.0f;
+
+        if (tr->timer >= TRANS_CENTER_DUR) {
+            p->x      = target_x;
+            tr->phase = TRANS_ACCEL;
+            tr->timer = 0;
+        }
+    }
+    else if (tr->phase == TRANS_ACCEL) {
+        tr->timer++;
+        float t        = (float)tr->timer / TRANS_ACCEL_DUR;
+        tr->star_speed = 1.0f + t * t * 29.0f;
+        tr->sol_offset += tr->star_speed * 2.0f;
+
+        if (tr->timer >= TRANS_ACCEL_DUR) {
+            tr->phase = TRANS_WARP;
+            tr->timer = 0;
+        }
+    }
+    else if (tr->phase == TRANS_WARP) {
+        tr->timer++;
+        tr->star_speed = 30.0f;
+        p->y -= 25.0f;
+
+        if (!tr->level_changed && p->y < -84.0f) {
+            game_next_level(game, boss);
+            game->level_complete = 0;
+            *boss_dead_sound     = 0;
+            tr->level_changed    = 1;
+            p->x  = (float)(SCREEN_W / 2 - 30);
+            p->y  = -200.0f;
+            p->dx = 0.0f;
+            p->dy = 0.0f;
+        }
+
+        if (tr->level_changed && tr->timer >= TRANS_WARP_DUR) {
+            tr->phase = TRANS_ARRIVE;
+            tr->timer = 0;
+        }
+    }
+    else if (tr->phase == TRANS_ARRIVE) {
+        tr->timer++;
+        float t        = (float)tr->timer / TRANS_ARRIVE_DUR;
+        tr->star_speed = 30.0f * (1.0f - t) + 1.0f;
+        float ease_in  = t * t;
+        tr->sol_offset = (float)SCREEN_H * (1.0f - ease_in);
+
+        if (tr->timer >= TRANS_ARRIVE_DUR) {
+            tr->sol_offset = 0.0f;
+            tr->star_speed = 1.0f;
+            tr->phase      = TRANS_DESCEND;
+            tr->timer      = 0;
+            p->y           = -100.0f;
+        }
+    }
+    else if (tr->phase == TRANS_DESCEND) {
+        tr->timer++;
+        float t    = (float)tr->timer / TRANS_DESCEND_DUR;
+        if (t > 1.0f) t = 1.0f;
+        float ease = 1.0f - (1.0f - t) * (1.0f - t);
+        p->y  = -100.0f + (player_game_y - (-100.0f)) * ease;
+        p->dx = 0.0f;
+        p->dy = 0.0f;
+
+        if (tr->timer >= TRANS_DESCEND_DUR) {
+            // Fin : on ne peut pas accéder à bmps ici,
+            // la synchronisation du fond se fait dans display_transition()
+            p->y           = player_game_y;
+            p->x           = (float)(SCREEN_W / 2 - 30);
+            tr->phase      = TRANS_INACTIVE;
+            tr->star_speed = 1.0f;
+            tr->sol_offset = 0.0f;
+            tr->level_changed = 0;
+            return 0; // transition terminée cette frame
+        }
+    }
+
+    return 1; // toujours active
+}
+
+// Dessine la frame de cinématique (fond étoilé + sol avec offset + vaisseau).
+// Appeler après transition_update() si celui-ci retourne 1,
+// ET aussi la dernière frame où il retourne 0 (pour la sync du fond).
+void display_transition(Transition *tr, Bitmaps *b, Assets *assets,
+                        Player *p, Game *game, Etoile *etoiles, int n_etoiles) {
+    clear_bitmap(b->buffer);
+
+    // Fond étoilé depuis le tableau
+    for (int i = 0; i < n_etoiles; i++) {
+        int gris = etoiles[i].luminosite;
+        putpixel(b->buffer, etoiles[i].x, etoiles[i].y, makecol(gris, gris, gris));
+    }
+
+    // Sol avec offset (niveaux non-boss uniquement)
+    if (!game_is_boss(game)) {
+        int gh  = game_ground_height();
+        int gy  = SCREEN_H - gh + (int)tr->sol_offset;
+        int idx = game_level_index(game);
+        if (idx >= 3) idx = 2;
+        if (gy < SCREEN_H) {
+            stretch_blit(assets->sol_sprites[idx], b->buffer,
+                         0, 0,
+                         assets->sol_sprites[idx]->w,
+                         assets->sol_sprites[idx]->h,
+                         0, gy, SCREEN_W, gh);
+        }
+    }
+
+    // Vaisseau : visible seulement dans le champ
+    if (p->y > -84.0f && p->y < (float)SCREEN_H)
+        draw_player_ship(b->buffer, p, assets);
+
+    // Si la transition vient juste de se terminer (phase repassée à INACTIVE),
+    // on synchronise bmps.fond pour que le rendu normal reprenne sans saut.
+    if (tr->phase == TRANS_INACTIVE) {
+        sync_fond_with_etoiles(b->fond, etoiles, n_etoiles);
+        b->fond_scroll_x = 0.0f;
+    }
+
+    blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
