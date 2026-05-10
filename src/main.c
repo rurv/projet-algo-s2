@@ -82,7 +82,7 @@ int main() {
                 ecran = choix(ecran, bmps.buffer, &assets, &player);
                 break;
             case DECOMPTE:
-                ecran = decompte(ecran, bmps.buffer, &assets, &player);
+                ecran = decompte(ecran, bmps.buffer, &assets, &player, &audio);
                 break;
 
             case JEU: {

@@ -6,6 +6,7 @@
 #include <allegro.h>
 #include "display.h"   // fournit Bitmaps, Etoile, Transition, etc.
 #include "player.h"
+#include "audio.h"
 
 enum EcranActuel { MENU_PRINCIPAL, SAISIE_PSEUDO, REGLE, DECOMPTE, CHOIX, JEU, REPRENDRE, QUITTER, GAME_OVER, SAUVEGARDE, PAUSE };
 enum DiferrentDecompte {DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN};
@@ -42,7 +43,7 @@ enum EcranActuel menu_principale(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel saisie_pseudo(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
-enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
+enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p, Audio *audio);
 enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 

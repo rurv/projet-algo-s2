@@ -185,13 +185,19 @@ enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, P
     return ecran;
         }
 
-enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p) {
+enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p, Audio *audio) {
     static enum DiferrentDecompte etat_decompte;
+    static int premier_affichage = 1;
     int sx[] = {152, 208, 64, 136};
     int sy[] = {336, 328, 368, 416};
     int sw[] = {48, 47, 47, 47};
     int sh[] = {64, 63, 40, 31};
     if (etat_decompte == DECOMPTE1) {
+
+        if (premier_affichage) {
+            audio_play_speech1(audio);
+            premier_affichage = 0;
+        }
 
             // Personnage en bas à gauche : ~2% en X, ~82% en Y
             stretch_sprite(buffer, assets->claude, LX(0.025), LY(0.817), LX(CLAUDE_L), LY(CLAUDE_H));
@@ -208,6 +214,8 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
             if (mouse_b & 1) {
                 ATTENDRE_RELACHE();
                 while(mouse_b & 1) rest(1);
+                audio_stop_speech(audio);  // coupe le speech en cours
+                audio_play_speech2(audio); // lance le suivant
                 etat_decompte = DECOMPTE2;
             }
         }
@@ -230,6 +238,8 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
             if (mouse_b & 1) {
                 ATTENDRE_RELACHE();
                 while(mouse_b & 1) rest(1);
+                audio_stop_speech(audio);
+                audio_play_speech3(audio);
                 etat_decompte = DECOMPTE3;
             }
         }
@@ -260,12 +270,16 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
                     mouse_y > LY(0.895) && mouse_y < LY(0.922)) {
                     ATTENDRE_RELACHE();
                     while(mouse_b & 1) rest(1);
+                    audio_stop_speech(audio);
+                    audio_play_speech4(audio);
                     etat_decompte = DECOMPTEY;
                 }
                 if (mouse_x > LX(0.371) && mouse_x < LX(0.571) &&
                     mouse_y > LY(0.895) && mouse_y < LY(0.922)) {
                     ATTENDRE_RELACHE();
                     while(mouse_b & 1) rest(1);
+                    audio_stop_speech(audio);
+                    audio_play_speech5(audio);
                     etat_decompte = DECOMPTEN;
                 }
             }
@@ -285,6 +299,7 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
 
             if (mouse_b & 1) {
                 ATTENDRE_RELACHE();
+                audio_stop_speech(audio);
                 return JEU;
             }
         }
@@ -304,6 +319,7 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
 
             if (mouse_b & 1) {
                 ATTENDRE_RELACHE();
+                audio_stop_speech(audio);
                 return JEU;
             }
         }
