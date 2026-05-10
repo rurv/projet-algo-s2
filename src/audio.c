@@ -47,6 +47,14 @@ void audio_init(Audio *a) {
         allegro_exit();
         exit(1);
     }
+
+    a->hit_laser_sfx = load_sample("assets/sfx/hit_laser2.wav");
+    if (!a->hit_laser_sfx) a->hit_laser_sfx = load_sample("../assets/sfx/hit_laser2.wav");
+    if (!a->hit_laser_sfx) {
+        allegro_message("Erreur chargement hit_laser2.wav");
+        allegro_exit();
+        exit(1);
+    }
 }
 
 void audio_destroy(Audio *a) {
@@ -55,6 +63,7 @@ void audio_destroy(Audio *a) {
     destroy_sample(a->hit_sfx);
     destroy_sample(a->boss_eclair);
     destroy_sample(a->bo_sfx);
+    destroy_sample(a->hit_laser_sfx);
 }
 
 void audio_play_laser(Audio *a) {
@@ -83,4 +92,8 @@ void audio_play_bo(Audio *a) {
 
 void audio_stop_bo(Audio *a) {
     stop_sample(a->bo_sfx);
+}
+
+void audio_play_hit_laser(Audio *a) {
+    play_sample(a->hit_laser_sfx, 90, 128, 1000, 0);
 }

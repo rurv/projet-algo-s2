@@ -97,7 +97,7 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
 
     if (!game_is_boss(game)) {
         asteroids_update(&game->am);
-        colision_laser_asteroids(player, game);
+        colision_laser_asteroids(player, game, audio);
 
         // Passage automatique quand tous les astéroïdes sont détruits
         if (asteroids_all_dead(&game->am) && !game->level_complete)
@@ -176,7 +176,7 @@ void colision_eclair(Player *player, Boss *boss) {
     }
 }
 
-void colision_laser_asteroids(Player *player, Game *game) {
+void colision_laser_asteroids(Player *player, Game *game, Audio *audio) {
     AsteroidManager *am = &game->am;
     for (int l = 0; l < player->laser_count; l++) {
         if (!player->lasers[l].active) continue;
@@ -190,6 +190,7 @@ void colision_laser_asteroids(Player *player, Game *game) {
             if (dist2 <= r * r) {
                 player->lasers[l].active = 0;
                 asteroid_split(am, a, game);
+                audio_play_hit_laser(audio);
                 break;
             }
         }
@@ -228,6 +229,9 @@ void colision_asteroids_player(Player *p, AsteroidManager *am, Audio *audio) {
                     // Invincibilité de sécurité (clignotement)
                     p->invincible = 1;
                     p->invincible_timer = 120;
+                }
+                else {
+                    audio_play_hit_laser(audio); // uniquement quand le bouclier est activé
                 }
 
                 // L'astéroïde explose dans tous les cas

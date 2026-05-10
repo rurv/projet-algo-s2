@@ -88,6 +88,7 @@ int main() {
             case JEU: {
                 // ── Game Over ────────────────────────────────────────────────
                 if (player.vies <= 0) {
+                    audio_stop_boss_eclair(&audio);
                     transition_reset(&trans);
                     ecran = GAME_OVER;
                     break;

@@ -42,7 +42,7 @@ Game init_game(void);
 void game_update(Player *player, Boss *boss, Game *game, Audio *audio);
 void colision(Player *player, Boss *boss);
 void colision_eclair(Player *player, Boss *boss);
-void colision_laser_asteroids(Player *player, Game *game);
+void colision_laser_asteroids(Player *player, Game *game, Audio *audio);
 
 int  game_level_index(const Game *game);
 int  game_is_boss(const Game *game);

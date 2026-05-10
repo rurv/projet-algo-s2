@@ -14,6 +14,7 @@ typedef struct Audio {
     SAMPLE *hit_sfx;
     SAMPLE *bo_sfx;
     SAMPLE *boss_eclair;
+    SAMPLE *hit_laser_sfx;
 } Audio;
 
 void audio_init(Audio *a);              // initialisation de la structure audio et chargements
@@ -25,5 +26,6 @@ void audio_play_boss_eclair(Audio *a);  // lecture de l'audio eclair du boss
 void audio_play_bo(Audio *a);           // lecture de la musique de fond
 void audio_stop_bo(Audio *a);           // arret de la musique de fond
 void audio_stop_boss_eclair(Audio *a);  // arret de l'audio eclair du boss
+void audio_play_hit_laser(Audio *a);    // sfx pour asteroide detruit
 
 #endif //PROJET_ALGO_S2_AUDIO_H
