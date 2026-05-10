@@ -310,6 +310,53 @@ enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets
     return ecran;
 }
 
+enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer) {
+    ecrire_centre_texte(buffer, "PAUSE",SCREEN_WIDTH/2, LY(0.133), makecol(100, 150, 255), 10);
+
+    // (~31% à 69% en X, ~33% à 43% en Y)
+    rectfill(buffer, LX(0.3125), LY(0.333), LX(0.6875), LY(0.433), makecol(40, 50, 100));
+    ecrire_centre_texte(buffer, "Reprendre",SCREEN_WIDTH/2, LY(0.367), makecol(255, 255, 255), 4);
+
+
+    rectfill(buffer, LX(0.3125), LY(0.467), LX(0.6875), LY(0.567), makecol(30, 30, 50));
+    ecrire_centre_texte(buffer, "Sauvegarde",SCREEN_WIDTH/2, LY(0.500), makecol(200, 200, 200), 4);
+
+
+    rectfill(buffer, LX(0.3125), LY(0.600), LX(0.6875), LY(0.700), makecol(30, 30, 50));
+    ecrire_centre_texte(buffer, "Regles",SCREEN_WIDTH/2, LY(0.633), makecol(200, 200, 200), 4);
+
+
+    rectfill(buffer, LX(0.3125), LY(0.733), LX(0.6875), LY(0.800), makecol(30, 30, 50));
+    ecrire_centre_texte(buffer, "Menu principale",SCREEN_WIDTH/2, LY(0.750), makecol(200, 200, 200), 4);
+
+
+    if (mouse_b & 1) {
+        if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+            mouse_y > LY(0.333)  && mouse_y < LY(0.433)) {
+            ATTENDRE_RELACHE();
+            return JEU;
+
+
+            } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                       mouse_y > LY(0.467)  && mouse_y < LY(0.567)) {
+                ATTENDRE_RELACHE();
+                return SAUVEGARDE;
+
+                       } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                                  mouse_y > LY(0.600)  && mouse_y < LY(0.700)) {
+                           ATTENDRE_RELACHE();
+                           return REGLE;
+
+                                  } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                                             mouse_y > LY(0.733)  && mouse_y < LY(0.800)) {
+                                      ATTENDRE_RELACHE();
+                                      return MENU_PRINCIPAL;
+
+                                             }
+    }
+    return ecran;
+}
+
 enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p) {
     // Titre "GAME OVER"
     ecrire_centre_texte(buffer, "GAME OVER", SCREEN_WIDTH / 2, LY(0.15), makecol(220, 30, 30), 9);

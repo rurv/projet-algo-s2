@@ -14,6 +14,7 @@ void player_init (Player *p) {
     p->skin_id = 0;
     p->lasers = malloc(MAX_LASERS * sizeof(Laser));
     p->laser_count = MAX_LASERS;
+    p->pseudo[0] = '\0';
 
     for (int i = 0; i < MAX_LASERS; i++) {
         p->lasers[i].active = 0;

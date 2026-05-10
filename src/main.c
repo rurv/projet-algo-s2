@@ -264,6 +264,10 @@ int main() {
 
                 // ── Contrôles (bloqués pendant cinématique) ──────────────────
                 if (!controls_locked) {
+                    if (key[KEY_P]) {
+                        while(key[KEY_P]) rest(1);
+                        ecran = PAUSE;
+                    }
                     if (key[KEY_S] && !s_pressed) { save_game(&player, &game); s_pressed = 1; }
                     if (!key[KEY_S]) s_pressed = 0;
 
@@ -354,6 +358,13 @@ int main() {
                 rest(1);
                 break;
             } // case JEU
+
+            case PAUSE:
+                ecran =pause_level(ecran, bmps.buffer);
+                if (ecran == JEU) {
+                    space_pressed = 1;
+                }
+                break;
 
             case REPRENDRE:
                 if (load_game(&player, &game, &boss))
