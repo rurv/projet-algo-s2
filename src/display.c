@@ -717,7 +717,7 @@ void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
     // ── Phase 0 ─────────────────────────────────────────────────────────────
     if (d->phase == 0) {
         if (d->premier_affichage) {
-            audio_play_speech1(audio);
+            audio_play_speech6(audio);
             d->premier_affichage = 0;
         }
         ecrire_texte(buffer, "Recrue, vous m'entendez ? Vous m'entendez ? ...",
@@ -728,7 +728,7 @@ void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
             while (mouse_b & 1) rest(1);
             while (key[KEY_SPACE]) rest(1);
             audio_stop_speech(audio);
-            audio_play_speech2(audio);
+            audio_play_speech7(audio);
             d->phase             = 1;
             d->premier_affichage = 0;
         }
