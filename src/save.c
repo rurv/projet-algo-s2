@@ -3,26 +3,21 @@
 //
 
 #include "../headers/save.h"
-//
-// save.c - Système de sauvegarde
-//
-
-#include "../headers/save.h"
 #include <stdio.h>
 #include <string.h>
 
 // Retourne le chemin valide vers le fichier de sauvegarde, ou NULL
 static const char *save_path(void) {
-    FILE *f = fopen(SAVE_FILE, "rb");
+    FILE *f = fopen(SAVE_FILE, "r");
     if (f) { fclose(f); return SAVE_FILE; }
-    f = fopen(SAVE_FILE_ALT, "rb");
+    f = fopen(SAVE_FILE_ALT, "r");
     if (f) { fclose(f); return SAVE_FILE_ALT; }
     return NULL;
 }
 
 // Retourne le chemin d'écriture (préfère le chemin principal)
 static const char *write_path(void) {
-    FILE *f = fopen(SAVE_FILE, "wb");
+    FILE *f = fopen(SAVE_FILE, "w");
     if (f) { fclose(f); return SAVE_FILE; }
     return SAVE_FILE_ALT;
 }
@@ -32,33 +27,30 @@ int save_exists(void) {
     const char *path = save_path();
     if (!path) return 0;
 
-    FILE *f = fopen(path, "rb");
+    FILE *f = fopen(path, "r");
     if (!f) return 0;
 
-    SaveData sd;
-    int ok = (fread(&sd, sizeof(SaveData), 1, f) == 1) && (sd.magic == SAVE_MAGIC);
+    char magic[8];
+    int ok = (fscanf(f, "%7s", magic) == 1) && (strcmp(magic, SAVE_MAGIC) == 0);
     fclose(f);
     return ok;
 }
 
-// Sauvegarde l'état actuel de la partie
+// Sauvegarde l'état actuel de la partie dans un fichier texte lisible
 // Retourne 1 si succès, 0 si échec
 int save_game(const Player *p, const Game *game) {
-    SaveData sd;
-    sd.magic       = SAVE_MAGIC;
-    sd.level_index = game_level_index(game);
-    sd.vies        = p->vies;
-    sd.skin_id     = p->skin_id;
-    strncpy(sd.pseudo, p->pseudo, sizeof(sd.pseudo) - 1);
-    sd.pseudo[sizeof(sd.pseudo) - 1] = '\0';
-
     const char *path = write_path();
-    FILE *f = fopen(path, "wb");
+    FILE *f = fopen(path, "w");
     if (!f) return 0;
 
-    int ok = (fwrite(&sd, sizeof(SaveData), 1, f) == 1);
+    fprintf(f, "%s\n",  SAVE_MAGIC);
+    fprintf(f, "%d\n",  game_level_index(game));
+    fprintf(f, "%d\n",  p->vies);
+    fprintf(f, "%d\n",  p->skin_id);
+    fprintf(f, "%s\n",  p->pseudo);
+
     fclose(f);
-    return ok;
+    return 1;
 }
 
 // Charge une sauvegarde et applique les données au joueur et au jeu
@@ -67,15 +59,24 @@ int load_game(Player *p, Game *game, Boss *boss) {
     const char *path = save_path();
     if (!path) return 0;
 
-    FILE *f = fopen(path, "rb");
+    FILE *f = fopen(path, "r");
     if (!f) return 0;
 
     SaveData sd;
-    if (fread(&sd, sizeof(SaveData), 1, f) != 1 || sd.magic != SAVE_MAGIC) {
-        fclose(f);
-        return 0;
-    }
+    int ok = 1;
+
+    // Lecture ligne par ligne
+    if (fscanf(f, "%7s\n",  sd.magic)       != 1) ok = 0;
+    if (fscanf(f, "%d\n",  &sd.level_index) != 1) ok = 0;
+    if (fscanf(f, "%d\n",  &sd.vies)        != 1) ok = 0;
+    if (fscanf(f, "%d\n",  &sd.skin_id)     != 1) ok = 0;
+    if (fgets(sd.pseudo, sizeof(sd.pseudo), f) == NULL) ok = 0;
+    // Supprimer le \n final si présent
+    sd.pseudo[strcspn(sd.pseudo, "\n")] = '\0';
+
     fclose(f);
+
+    if (!ok || strcmp(sd.magic, SAVE_MAGIC) != 0) return 0;
 
     // Restaure le joueur
     strncpy(p->pseudo, sd.pseudo, sizeof(p->pseudo) - 1);
