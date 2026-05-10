@@ -215,7 +215,7 @@ int main() {
                 if (phase_avant == VICTORY_BOSS_DYING && victory.phase == VICTORY_BOSS_EXPLODING)
                     audio_play_explode(&audio);
                 victory_cinematic_draw(&victory, &bmps, &assets, &player,
-                                       &boss, etoiles, NOMBRE_ETOILES);
+                                       &boss, etoiles, NOMBRE_ETOILES , &audio);
 
                 // Passage à l'écran de victoire une fois la cinématique terminée
                 if (victory.phase == VICTORY_SCREEN)

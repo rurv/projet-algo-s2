@@ -7,7 +7,7 @@
 
 #include "assets.h"
 
-#define BOSS_MAX_PV      700
+#define BOSS_MAX_PV      10
 #define BOSS_MAX_ECLAIRS 8
 
 // Séquences de tir d'éclair disponibles

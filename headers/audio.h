@@ -22,6 +22,7 @@ typedef struct Audio {
     SAMPLE *speech5_sfx;
     SAMPLE *speech6_sfx;
     SAMPLE *speech7_sfx;
+    SAMPLE *speech8_sfx;
 } Audio;
 
 void audio_init(Audio *a);              // initialisation de la structure audio et chargements
@@ -41,6 +42,7 @@ void audio_play_speech4(Audio *a);
 void audio_play_speech5(Audio *a);
 void audio_play_speech6(Audio *a);
 void audio_play_speech7(Audio *a);
+void audio_play_speech8(Audio *a);
 void audio_stop_speech(Audio *a);       // arrête tous les dialogues
 
 #endif //PROJET_ALGO_S2_AUDIO_H

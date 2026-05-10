@@ -103,6 +103,10 @@ void audio_init(Audio *a) {
     a->speech7_sfx = load_sample("assets/sfx/speech7.wav");
     if (!a->speech7_sfx) a->speech7_sfx = load_sample("../assets/sfx/speech7.wav");
     if (!a->speech7_sfx) { allegro_message("Erreur chargement speech7.wav"); allegro_exit(); exit(1); }
+
+    a->speech8_sfx = load_sample("assets/sfx/speech8.wav");
+    if (!a->speech8_sfx) a->speech8_sfx = load_sample("../assets/sfx/speech8.wav");
+    if (!a->speech8_sfx) { allegro_message("Erreur chargement speech8.wav"); allegro_exit(); exit(1); }
 }
 
 
@@ -121,6 +125,7 @@ void audio_destroy(Audio *a) {
     destroy_sample(a->speech5_sfx);
     destroy_sample(a->speech6_sfx);
     destroy_sample(a->speech7_sfx);
+    destroy_sample(a->speech8_sfx);
 }
 
 void audio_play_laser(Audio *a) {
@@ -162,6 +167,7 @@ void audio_play_speech4(Audio *a) { play_sample(a->speech4_sfx, 200, 128, 1000, 
 void audio_play_speech5(Audio *a) { play_sample(a->speech5_sfx, 200, 128, 1000, 0); }
 void audio_play_speech6(Audio *a) { play_sample(a->speech6_sfx, 200, 128, 1000, 0); }
 void audio_play_speech7(Audio *a) { play_sample(a->speech7_sfx, 200, 128, 1000, 0); }
+void audio_play_speech8(Audio *a) { play_sample(a->speech8_sfx, 200, 128, 1000, 0); }
 void audio_stop_speech(Audio *a) {
     stop_sample(a->speech1_sfx);
     stop_sample(a->speech2_sfx);
@@ -170,4 +176,5 @@ void audio_stop_speech(Audio *a) {
     stop_sample(a->speech5_sfx);
     stop_sample(a->speech6_sfx);
     stop_sample(a->speech7_sfx);
+    stop_sample(a->speech8_sfx);
 }

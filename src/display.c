@@ -574,7 +574,8 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
 
 // Rendu de la cinématique de victoire
 void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
-                            Player *p, Boss *boss, Etoile *etoiles, int n_etoiles) {
+Player *p, Boss *boss, Etoile *etoiles, int n_etoiles,
+Audio *audio) {
     clear_to_color(b->buffer, makecol(10, 10, 20));
 
     // Fond étoilé commun à toutes les phases
@@ -621,6 +622,12 @@ void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
             break;
 
         case VICTORY_DIALOGUE: {
+            static int speech8_joue = 0;
+            if (!speech8_joue) {
+                audio_play_speech8(audio);
+                speech8_joue = 1;
+            }
+            if (vc->dialogue_done) speech8_joue = 0;
             // Étoiles rapides + vaisseau centré + dialogue Claude
             draw_player_ship(b->buffer, p, assets);
 

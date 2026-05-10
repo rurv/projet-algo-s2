@@ -102,7 +102,8 @@ void victory_cinematic_start(VictoryCinematic *vc);
 int  victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
                                Etoile *etoiles, int n_etoiles, float player_game_y);
 void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
-                            Player *p, Boss *boss, Etoile *etoiles, int n_etoiles);
+                            Player *p, Boss *boss, Etoile *etoiles, int n_etoiles,
+                            Audio *audio);
 
 // Dialogue Game Over
 void gameover_dialogue_reset(GameOverDialogue *d);
