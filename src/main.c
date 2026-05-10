@@ -146,7 +146,7 @@ int main() {
                     break;
                 }
 
-                // Contrôles pendant le jeu normal
+                // Contrôles
                 if (key[KEY_P]) {
                     while (key[KEY_P]) rest(1);
                     ecran = PAUSE;
@@ -184,7 +184,7 @@ int main() {
                     space_pressed = 0;
                 }
 
-                // Mise à jour logique du jeu
+                // Mise à jour du jeu
                 game_update(&player, &boss, &game, &audio);
                 colision_asteroids_player(&player, &game.am, &audio);
 
@@ -201,10 +201,10 @@ int main() {
             }
 
             case VICTOIRE_CINEMA: {
-                // Contrôles bloqués pendant la cinématique de victoire
+                // Controles bloquer pendant les cinématiques
                 clear_to_color(bmps.buffer, makecol(10, 10, 20));
 
-                // Détection clic pour passer le dialogue
+                // clic pour passer le dialogue
                 if (victory.phase == VICTORY_DIALOGUE && (mouse_b & 1))
                     victory.dialogue_done = 1;
 
@@ -217,7 +217,7 @@ int main() {
                 victory_cinematic_draw(&victory, &bmps, &assets, &player,
                                        &boss, etoiles, NOMBRE_ETOILES , &audio);
 
-                // Passage à l'écran de victoire une fois la cinématique terminée
+                // ecran de victoire apres la cinématique
                 if (victory.phase == VICTORY_SCREEN)
                     ecran = VICTOIRE;
 
