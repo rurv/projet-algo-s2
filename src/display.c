@@ -692,20 +692,25 @@ int gameover_dialogue_update(GameOverDialogue *d) {
     return 1;
 }
 
-void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets, Player *p, Audio *audio) {
+void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
+                             Player *p, Audio *audio) {
     if (!d->active) return;
 
-    // Personnage Claude en bas à gauche
-    stretch_sprite(buffer, assets->claude, LX(0.025), LY(0.817),
-                   LX(CLAUDE_L), LY(CLAUDE_H));
+    int sx[] = {152, 208, 64, 136};
+    int sy[] = {336, 328, 368, 416};
+    int sw[] = {48, 47, 47, 47};
+    int sh[] = {64, 63, 40, 31};
 
-    // Bulle de dialogue
-    int bx  = LX(0.188);
-    int by  = LY(0.833);
-    int bw  = LX(0.78);
-    int bh  = LY(0.12);
-    rectfill(buffer, bx, by, bx + bw, by + bh, makecol(20, 20, 50));
-    rect    (buffer, bx, by, bx + bw, by + bh, makecol(100, 150, 255));
+    // Claude en bas à gauche
+    stretch_sprite(buffer, assets->claude, LX(0.025), LY(0.817), LX(CLAUDE_L), LY(CLAUDE_H));
+
+    // Vaisseau centré
+    int v_w = LX(VAISSEAU_L);
+    int v_h = LY(VAISSEAU_H);
+    masked_stretch_blit(assets->player_sprites,
+                        buffer,
+                        sx[p->skin_id], sy[p->skin_id], sw[p->skin_id], sh[p->skin_id],
+                        LX(0.5) - v_w/2, LY(0.5) - v_h/2, v_w, v_h);
 
     // ── Phase 0 ─────────────────────────────────────────────────────────────
     if (d->phase == 0) {
@@ -713,89 +718,31 @@ void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
             audio_play_speech1(audio);
             d->premier_affichage = 0;
         }
+        ecrire_texte(buffer, "Recrue, vous m'entendez ? Vous m'entendez ? ...",
+                     LX(0.188), LY(0.850), makecol(255, 255, 255), 1.7);
 
-        const char *msg = "Recrue, vous m'entendez ? Vous m'entendez ? ...";
-        int len = 0; while (msg[len]) len++;
-
-        d->timer++;
-        if (d->timer % 3 == 0 && d->char_shown < len) d->char_shown++;
-
-        char partial[64]; int i;
-        for (i = 0; i < d->char_shown && i < 63; i++) partial[i] = msg[i];
-        partial[i] = '\0';
-
-        int tw = text_length(font, partial);
-        BITMAP *tmp = create_bitmap(tw + 1, text_height(font));
-        if (tmp) {
-            clear_to_color(tmp, makecol(255, 0, 255));
-            textout_ex(tmp, font, partial, 0, 0, makecol(255, 255, 255), -1);
-            stretch_sprite(buffer, tmp, bx + 10, by + 12, tw * 2, text_height(font) * 2);
-            destroy_bitmap(tmp);
-        }
-
-        if (d->char_shown >= len) {
-            const char *hint = "[ Cliquez pour continuer ]";
-            int hw = text_length(font, hint);
-            BITMAP *htmp = create_bitmap(hw, text_height(font));
-            if (htmp) {
-                clear_to_color(htmp, makecol(255, 0, 255));
-                textout_ex(htmp, font, hint, 0, 0, makecol(150, 150, 150), -1);
-                stretch_sprite(buffer, htmp,
-                               bx + bw - hw * 2 - 10, by + bh - text_height(font) * 2 - 6,
-                               hw * 2, text_height(font) * 2);
-                destroy_bitmap(htmp);
-            }
-            if (mouse_b & 1) {
-                ATTENDRE_RELACHE();
-                while (mouse_b & 1) rest(1);
-                audio_stop_speech(audio);
-                audio_play_speech2(audio);
-                d->phase        = 1;
-                d->char_shown   = 0;
-                d->timer        = 0;
-            }
+        if ((mouse_b & 1) || key[KEY_SPACE]) {
+            ATTENDRE_RELACHE();
+            while (mouse_b & 1) rest(1);
+            while (key[KEY_SPACE]) rest(1);
+            audio_stop_speech(audio);
+            audio_play_speech2(audio);
+            d->phase             = 1;
+            d->premier_affichage = 0;
         }
 
     // ── Phase 1 ─────────────────────────────────────────────────────────────
     } else if (d->phase == 1) {
-        const char *msg = "Ne vous inquietez pas, nous allons vous rapatrier...";
-        int len = 0; while (msg[len]) len++;
+        ecrire_texte(buffer, "Ne vous inquietez pas, nous allons vous rapatrier...",
+                     LX(0.188), LY(0.850), makecol(255, 255, 255), 1.7);
 
-        d->timer++;
-        if (d->timer % 3 == 0 && d->char_shown < len) d->char_shown++;
-
-        char partial[64]; int i;
-        for (i = 0; i < d->char_shown && i < 63; i++) partial[i] = msg[i];
-        partial[i] = '\0';
-
-        int tw = text_length(font, partial);
-        BITMAP *tmp = create_bitmap(tw + 1, text_height(font));
-        if (tmp) {
-            clear_to_color(tmp, makecol(255, 0, 255));
-            textout_ex(tmp, font, partial, 0, 0, makecol(255, 255, 255), -1);
-            stretch_sprite(buffer, tmp, bx + 10, by + 12, tw * 2, text_height(font) * 2);
-            destroy_bitmap(tmp);
-        }
-
-        if (d->char_shown >= len) {
-            const char *hint = "[ Cliquez pour continuer ]";
-            int hw = text_length(font, hint);
-            BITMAP *htmp = create_bitmap(hw, text_height(font));
-            if (htmp) {
-                clear_to_color(htmp, makecol(255, 0, 255));
-                textout_ex(htmp, font, hint, 0, 0, makecol(150, 150, 150), -1);
-                stretch_sprite(buffer, htmp,
-                               bx + bw - hw * 2 - 10, by + bh - text_height(font) * 2 - 6,
-                               hw * 2, text_height(font) * 2);
-                destroy_bitmap(htmp);
-            }
-            if (mouse_b & 1) {
-                ATTENDRE_RELACHE();
-                while (mouse_b & 1) rest(1);
-                audio_stop_speech(audio);
-                d->done   = 1;
-                d->active = 0;
-            }
+        if ((mouse_b & 1) || key[KEY_SPACE]) {
+            ATTENDRE_RELACHE();
+            while (mouse_b & 1) rest(1);
+            while (key[KEY_SPACE]) rest(1);
+            audio_stop_speech(audio);
+            d->done   = 1;
+            d->active = 0;
         }
     }
 }
