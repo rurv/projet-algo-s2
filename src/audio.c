@@ -8,11 +8,12 @@ void audio_init(Audio *a) {
     install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
     set_volume_per_voice(0);
     reserve_voices(8, 0);
-    a->laser_sfx = load_sample("../assets/sfx/laserSFX.wav");
+
+    a->laser_sfx = load_sample("../assets/sfx/laserSFX.wav");//cherche le fichier
     if (!a->laser_sfx) {
         a->laser_sfx = load_sample("assets/sfx/laserSFX.wav");
         if (!a->laser_sfx) {
-            allegro_message("Erreur chargement laserSFX.wav");
+            allegro_message("Erreur chargement laserSFX.wav"); // message d'erreur si fichier introuvable
             allegro_exit();
             exit(1);
         }
@@ -168,6 +169,7 @@ void audio_play_speech5(Audio *a) { play_sample(a->speech5_sfx, 200, 128, 1000, 
 void audio_play_speech6(Audio *a) { play_sample(a->speech6_sfx, 200, 128, 1000, 0); }
 void audio_play_speech7(Audio *a) { play_sample(a->speech7_sfx, 200, 128, 1000, 0); }
 void audio_play_speech8(Audio *a) { play_sample(a->speech8_sfx, 200, 128, 1000, 0); }
+
 void audio_stop_speech(Audio *a) {
     stop_sample(a->speech1_sfx);
     stop_sample(a->speech2_sfx);

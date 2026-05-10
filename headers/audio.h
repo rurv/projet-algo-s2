@@ -11,11 +11,11 @@
 typedef struct Audio {
     SAMPLE *laser_sfx;
     SAMPLE *explode_sfx;
-    SAMPLE *hit_sfx;
-    SAMPLE *bo_sfx;
+    SAMPLE *hit_sfx; // quand un asteroide touche le vaisseau
+    SAMPLE *bo_sfx; //bande son du jeu
     SAMPLE *boss_eclair;
-    SAMPLE *hit_laser_sfx;
-    SAMPLE *speech1_sfx;
+    SAMPLE *hit_laser_sfx; //quand un laser touche un asteroide
+    SAMPLE *speech1_sfx; //les dialogues
     SAMPLE *speech2_sfx;
     SAMPLE *speech3_sfx;
     SAMPLE *speech4_sfx;
@@ -35,7 +35,7 @@ void audio_play_bo(Audio *a);           // lecture de la musique de fond
 void audio_stop_bo(Audio *a);           // arret de la musique de fond
 void audio_stop_boss_eclair(Audio *a);  // arret de l'audio eclair du boss
 void audio_play_hit_laser(Audio *a);    // sfx pour asteroide detruit
-void audio_play_speech1(Audio *a);      //les dialogues
+void audio_play_speech1(Audio *a);      // lecture de l'audio des 8 dialogues
 void audio_play_speech2(Audio *a);
 void audio_play_speech3(Audio *a);
 void audio_play_speech4(Audio *a);

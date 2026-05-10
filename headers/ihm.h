@@ -39,17 +39,6 @@ enum DiferrentDecompte { DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN }
 
 #define ATTENDRE_RELACHE() do { while (mouse_b & 1) rest(10); } while(0)
 
-typedef struct {
-    int hauteur, longueure;
-    BITMAP *perso;
-} Personnage;
-
-typedef struct {
-    int x, y;
-    int vitesse;
-    BITMAP *skin;
-} Vaisseau;
-
 void ecrire_centre_texte(BITMAP *dest, const char *texte, int centre_x, int y, int couleur, float multiplicateur);
 void ecrire_texte(BITMAP *dest, const char *texte, int x, int y, int couleur, float multiplicateur);
 enum EcranActuel menu_principale(enum EcranActuel ecran, BITMAP *buffer);

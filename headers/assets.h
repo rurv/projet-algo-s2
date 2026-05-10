@@ -8,11 +8,6 @@
 
 // structure qui contient les assets
 typedef struct Assets {
-    BITMAP *bg1;
-    BITMAP *bg2;
-    BITMAP *bg3;
-    BITMAP *bg4;
-    BITMAP *bg5;
     BITMAP *player_sprites;
     BITMAP *asteroid_sprites[NB_ASTEROID_SPRITES];
     BITMAP *laser_sprite;
