@@ -87,7 +87,7 @@ int main() {
                 break;
 
             case REGLE:
-                ecran = regles(ecran, bmps.buffer);
+                ecran = regles(ecran, bmps.buffer,&assets);
                 break;
 
             case CHOIX:

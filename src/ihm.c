@@ -113,34 +113,60 @@ enum EcranActuel saisie_pseudo(enum EcranActuel ecran, BITMAP *buffer, Player *p
     return ecran;
 }
 
-enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer ) {
-    // Panneau principal : ~12% à 88% en X, ~33% à 92% en Y
-    rectfill(buffer, LX(0.100), LY(0.333), LX(0.875), LY(0.917), makecol(40, 50, 100));
+enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer, Assets *assets ) {
 
-    // Bouton retour : ~33% à 67% en X, ~82% à 90% en Y
+    ecrire_centre_texte(buffer, "RÈGLES DU JEU", SCREEN_WIDTH/2, LY(0.160), makecol(100, 200, 100), 8);
+
+    // TOUCHES ---------------------------------
+    ecrire_centre_texte(buffer, "LES TOUCHES", SCREEN_WIDTH/6, LY(0.350), makecol(200, 200, 200), 2);
+    stretch_sprite(buffer, assets->clavier, 50, 350, 402, 100);
+
+    ecrire_texte(buffer, " - Flèche GAUCHE : déplacement du vaisseau vers la gauche", 45, 480, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, " - Flèche DROITE : déplacement du vaisseau vers la droite", 45, 500, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, " - ESPACE : Tirer", 45, 520, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, " - P : Mettre la partie en pause", 45, 540, makecol(200, 200, 200), 1);
+
+    // PARTIE
+    ecrire_centre_texte(buffer, "LA PARTIE", SCREEN_WIDTH/2, LY(0.350), makecol(200, 200, 200), 2);
+    ecrire_texte(buffer, "Une partie comporte 3 niveaux,", 600, 350, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "avec un BOSS au niveau 4.", 600, 370, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Le but est de détruire les astéroïdes", 600, 390, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "à l'aide de votre vaisseau équipé", 600, 410, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "de missiles surpuissants.", 600, 430, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Surtout, ne touchez pas les astéroïdes,", 600, 450, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "sinon vous perdez un cœur.", 600, 470, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Vous avez 3 cœurs durant la partie.", 600, 490, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Si vous perdez tous vos cœurs,", 600, 510, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "vous perdez la partie.", 600, 530, makecol(200, 200, 200), 1);
+
+    // BONUS --------------------------------------
+    ecrire_centre_texte(buffer, "LES BONUS", 5*SCREEN_WIDTH/6, LY(0.350), makecol(200, 200, 200), 2);
+    ecrire_texte(buffer, "Il existe 2 types de bonus.", 1100, 350, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Pour les obtenir, il faut", 1100, 370, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "détruire des astéroïdes.", 1100, 390, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Le premier est de type offensif :", 1100, 410, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "sous la forme d'une bulle bleue,", 1100, 430, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "il permet de lancer plusieurs", 1100, 450, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "missiles en même temps.", 1100, 470, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Le second est de type défensif :", 1100, 490, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "sous la forme d'une bulle jaune,", 1100, 510, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "il offre un bouclier indestructible.", 1100, 530, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "Cependant, ces bonus consomment", 1100, 550, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "beaucoup d'énergie : surveillez", 1100, 570, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "la barre pour voir le temps", 1100, 590, makecol(200, 200, 200), 1);
+    ecrire_texte(buffer, "qu'il vous reste.", 1100, 610, makecol(200, 200, 200), 1);
+
+    // Bouton retour
     rectfill(buffer, LX(0.45), LY(0.817), LX(0.55), LY(0.900), makecol(150, 50, 50));
-
-    ecrire_centre_texte(buffer, "REGLES DU JEU",SCREEN_WIDTH/2, LY(0.160), makecol(100, 200, 100), 8);
-
-    ecrire_texte(buffer,"Regle n°1 : Les deplacements",250,LY(0.350),makecol(200, 200, 200), 2);
-
-    ecrire_texte(buffer, " - Q : deplacement du vaisseau vers la gauche",LX(0.131), LY(0.383), makecol(200, 200, 200), 1);
-    ecrire_texte(buffer, " - D : deplacement du vaisseau vers la droite",LX(0.131), LY(0.408), makecol(200, 200, 200), 1);
-
-    ecrire_centre_texte(buffer, "Regle n°2 : Fonctionnement d'une partie",SCREEN_WIDTH/2, LY(0.441), makecol(200, 200, 200), 2);
-    ecrire_texte(buffer, ".................",LX(0.131), LY(0.474), makecol(200, 200, 200), 1);
-
-    ecrire_centre_texte(buffer, "RETOUR",SCREEN_WIDTH/2, LY(0.850), makecol(255, 255, 255), 2);
+    ecrire_centre_texte(buffer, "RETOUR", SCREEN_WIDTH/2, LY(0.850), makecol(255, 255, 255), 2);
 
     if (mouse_b & 1) {
         if (mouse_x > LX(0.45) && mouse_x < LX(0.55) &&
             mouse_y > LY(0.817) && mouse_y < LY(0.900)) {
 
             ATTENDRE_RELACHE();
-            while(mouse_b & 1) rest(1);
-
             return MENU_PRINCIPAL;
-            }
+        }
     }
 
     return ecran;

@@ -24,6 +24,7 @@ void load_assets (Assets *a) {
     a->sol_sprites[0] = load_bitmap("assets/images/sol_lune.bmp", NULL);
     a->sol_sprites[1] = load_bitmap("assets/images/sol_cristal.bmp", NULL);
     a->sol_sprites[2] = load_bitmap("assets/images/sol_volcan.bmp", NULL);
+    a->clavier         = load_bitmap("assets/images/clavier.bmp", NULL);
     // chargement des sprites d'asteroide
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) a->asteroid_sprites[i] = load_bitmap(asteroid_paths[i], NULL);
     // chargement des chemins alternatifs en cas d'erreur
@@ -91,6 +92,14 @@ void load_assets (Assets *a) {
             exit(1);
         }
     }
+    if (!a->clavier) {
+        a->clavier = load_bitmap("../assets/images/clavier.bmp", NULL);
+        if (!a->clavier) {
+            allegro_message("Erreur chargement clavier.bmp");
+            allegro_exit();
+            exit(1);
+        }
+    }
     // chemin alternatif pour chaque asteroide
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
         if (!a->asteroid_sprites[i]) {
@@ -114,4 +123,5 @@ void free_assets (Assets *a) {
     destroy_bitmap(a->claude);
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) destroy_bitmap(a->asteroid_sprites[i]);
     for (int i = 0; i < 3; i++) destroy_bitmap(a->sol_sprites[i]);
+    destroy_bitmap(a->clavier);
 }

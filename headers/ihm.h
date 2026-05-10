@@ -54,7 +54,7 @@ void ecrire_centre_texte(BITMAP *dest, const char *texte, int centre_x, int y, i
 void ecrire_texte(BITMAP *dest, const char *texte, int x, int y, int couleur, float multiplicateur);
 enum EcranActuel menu_principale(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel saisie_pseudo(enum EcranActuel ecran, BITMAP *buffer, Player *p);
-enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
+enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer, Assets *assets);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
 enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p, Audio *audio);
 enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer);
