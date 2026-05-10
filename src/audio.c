@@ -55,7 +55,49 @@ void audio_init(Audio *a) {
         allegro_exit();
         exit(1);
     }
+
+    a->speech1_sfx = load_sample("assets/sfx/speech1.wav");
+    if (!a->speech1_sfx) a->speech1_sfx = load_sample("../assets/sfx/speech1.wav");
+    if (!a->speech1_sfx) {
+        allegro_message("Erreur chargement speech1.wav");
+        allegro_exit();
+        exit(1);
+    }
+
+    a->speech2_sfx = load_sample("assets/sfx/speech2.wav");
+    if (!a->speech2_sfx) a->speech2_sfx = load_sample("../assets/sfx/speech2.wav");
+    if (!a->speech2_sfx) {
+        allegro_message("Erreur chargement speech2.wav");
+        allegro_exit();
+        exit(1);
+    }
+
+    a->speech3_sfx = load_sample("assets/sfx/speech3.wav");
+    if (!a->speech3_sfx) a->speech3_sfx = load_sample("../assets/sfx/speech3.wav");
+    if (!a->speech3_sfx) {
+        allegro_message("Erreur chargement speech3.wav");
+        allegro_exit();
+        exit(1);
+    }
+
+    a->speech4_sfx = load_sample("assets/sfx/speech4.wav");
+    if (!a->speech4_sfx) a->speech4_sfx = load_sample("../assets/sfx/speech4.wav");
+    if (!a->speech4_sfx) {
+        allegro_message("Erreur chargement speech4.wav");
+        allegro_exit();
+        exit(1);
+    }
+
+    a->speech5_sfx = load_sample("assets/sfx/speech5.wav");
+    if (!a->speech5_sfx) a->speech5_sfx = load_sample("../assets/sfx/speech5.wav");
+    if (!a->speech5_sfx) {
+        allegro_message("Erreur chargement speech5.wav");
+        allegro_exit();
+        exit(1);
+    }
 }
+
+
 
 void audio_destroy(Audio *a) {
     destroy_sample(a->laser_sfx);
@@ -64,6 +106,11 @@ void audio_destroy(Audio *a) {
     destroy_sample(a->boss_eclair);
     destroy_sample(a->bo_sfx);
     destroy_sample(a->hit_laser_sfx);
+    destroy_sample(a->speech1_sfx);
+    destroy_sample(a->speech2_sfx);
+    destroy_sample(a->speech3_sfx);
+    destroy_sample(a->speech4_sfx);
+    destroy_sample(a->speech5_sfx);
 }
 
 void audio_play_laser(Audio *a) {
@@ -96,4 +143,17 @@ void audio_stop_bo(Audio *a) {
 
 void audio_play_hit_laser(Audio *a) {
     play_sample(a->hit_laser_sfx, 90, 128, 1000, 0);
+}
+
+void audio_play_speech1(Audio *a) { play_sample(a->speech1_sfx, 200, 128, 1000, 0); }
+void audio_play_speech2(Audio *a) { play_sample(a->speech2_sfx, 200, 128, 1000, 0); }
+void audio_play_speech3(Audio *a) { play_sample(a->speech3_sfx, 200, 128, 1000, 0); }
+void audio_play_speech4(Audio *a) { play_sample(a->speech4_sfx, 200, 128, 1000, 0); }
+void audio_play_speech5(Audio *a) { play_sample(a->speech5_sfx, 200, 128, 1000, 0); }
+void audio_stop_speech(Audio *a) {
+    stop_sample(a->speech1_sfx);
+    stop_sample(a->speech2_sfx);
+    stop_sample(a->speech3_sfx);
+    stop_sample(a->speech4_sfx);
+    stop_sample(a->speech5_sfx);
 }

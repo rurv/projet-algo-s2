@@ -6,6 +6,7 @@
 #include <allegro.h>
 #include "display.h"
 #include "player.h"
+#include "audio.h"
 
 enum EcranActuel {
     MENU_PRINCIPAL,
@@ -55,7 +56,7 @@ enum EcranActuel menu_principale(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel saisie_pseudo(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
-enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
+enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p, Audio *audio);
 enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p,
                                   GameOverDialogue *dialogue, Assets *assets);

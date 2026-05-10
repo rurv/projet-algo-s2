@@ -95,7 +95,7 @@ int main() {
                 break;
 
             case DECOMPTE:
-                ecran = decompte(ecran, bmps.buffer, &assets, &player);
+                ecran = decompte(ecran, bmps.buffer, &assets, &player, &audio);
                 break;
 
             case JEU: {
