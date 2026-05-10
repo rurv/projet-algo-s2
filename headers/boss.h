@@ -65,6 +65,8 @@ typedef struct Boss {
     int death_done;     // 1 quand la séquence de mort est terminée
 } Boss;
 
+void boss_start_new_seq(Boss *b);
+void boss_update_eclair_seq(Boss *b);
 void boss_init(Boss *b);
 void boss_move_right(Boss *b);
 void boss_move_left(Boss *b);

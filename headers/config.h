@@ -7,4 +7,5 @@
 
 #define SCREEN_WIDTH 1440
 #define SCREEN_HEIGHT 810
+
 #endif //PROJET_ALGO_S2_CONFIG_H

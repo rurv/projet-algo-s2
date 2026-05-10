@@ -21,8 +21,6 @@ add_executable(projet_algo_s2
         headers/player.h
         src/asteroids.c
         headers/asteroids.h
-        src/config.c
-        headers/config.h
         src/save.c
         headers/save.h
         src/boss.c

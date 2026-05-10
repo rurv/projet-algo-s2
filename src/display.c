@@ -31,7 +31,6 @@ static void draw_level_label(BITMAP *buf, const Game *game) {
     destroy_bitmap(tmp);
 }
 
-// Dessin d'un vaisseau joueur (réutilisé dans plusieurs contextes)
 static void draw_player_ship(BITMAP *dest, Player *p, Assets *assets) {
     int skin_x = 0, skin_y = 0, skin_w = 0, skin_h = 0;
     switch (p->skin_id) {
@@ -91,14 +90,10 @@ void init_display(Bitmaps *b, Assets *assets) {
 
 void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game) {
     clear_bitmap(b->buffer);
-
-    // Fond parallaxe
     b->fond_scroll_x += p->dx * 0.35f;
     int ox = ((int)b->fond_scroll_x % b->fond->w + b->fond->w) % b->fond->w;
     masked_blit(b->fond, b->buffer, ox, 0, 0,            0, SCREEN_W - ox, SCREEN_H);
     masked_blit(b->fond, b->buffer,  0, 0, SCREEN_W - ox, 0, ox,           SCREEN_H);
-
-    // Sol (absent au niveau boss)
     if (!game_is_boss(game)) {
         int gh  = game_ground_height();
         int gy  = SCREEN_H - gh;
@@ -109,24 +104,18 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
                      assets->sol_sprites[idx]->w, assets->sol_sprites[idx]->h,
                      0, gy, SCREEN_W, gh);
     }
-
-    // Astéroïdes (niveaux normaux uniquement)
     if (!game_is_boss(game)) {
         int idx = game_level_index(game);
         if (idx >= NB_ASTEROID_SPRITES) idx = NB_ASTEROID_SPRITES - 1;
         asteroids_draw(assets->asteroid_sprites[idx], b->buffer,
                        (AsteroidManager *)&game->am);
     }
-
-    // Lasers
     for (int i = 0; i < p->laser_count; i++) {
         if (!p->lasers[i].active) continue;
         masked_blit(assets->laser_sprite, b->buffer,
                     0, p->lasers[i].frame * 66,
                     p->lasers[i].x - 3, p->lasers[i].y - 50, 22, 66);
     }
-
-    // Vaisseau joueur
     int skin_x = 0, skin_y = 0, skin_w = 0, skin_h = 0;
     switch (p->skin_id) {
         case VAISSEAU1: skin_x=152; skin_y=336; skin_w=48; skin_h=64; break;
@@ -134,7 +123,6 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
         case VAISSEAU3: skin_x= 64; skin_y=368; skin_w=47; skin_h=40; break;
         case VAISSEAU4: skin_x=136; skin_y=416; skin_w=47; skin_h=31; break;
     }
-
     int afficher = 1;
     if (p->invincible && p->invincible_timer > 0) {
         if (p->invincible_timer % 10 < 5) afficher = 0;
@@ -145,26 +133,19 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
         destroy_bitmap(sub);
     }
     if (p->invincible) draw_neon_circle(b->buffer, p->x, p->y, 45);
-
-    // Boss avec tremblement éventuel pendant la séquence de mort
     if (game_is_boss(game) && boss->active) {
         int draw_x = (int)(boss->x + boss->shake_x);
         masked_blit(assets->boss, b->buffer, 0, 0, draw_x, boss->y, SCREEN_W, SCREEN_H);
-
-        // Mini-explosions pendant le tremblement
         if (boss->dying && boss->exp_mini_active) {
             int c   = boss->exp_mini_frame % 10;
             int row = boss->exp_mini_frame / 10;
             int ex  = (int)boss->exp_mini_x;
             int ey  = (int)boss->exp_mini_y;
-            // Explosion réduite (60x40 au lieu de 300x185)
             masked_stretch_blit(assets->explosion1, b->buffer,
                                 c * 100, row * 100, 100, 100,
                                 ex, ey, 60, 40);
         }
     }
-
-    // Grande explosion finale du boss
     if (game_is_boss(game) && boss->pv <= 0 && !boss->dying && boss->death_done) {
         boss->active = 0;
         boss->exp_timer++;
@@ -176,11 +157,8 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
                                 boss->x, boss->y, 300, 185);
         }
     }
-
-    // Éclairs du boss
     if (game_is_boss(game))
         display_eclair(b, boss, boss->eclair_active, boss->active);
-
     display_hud(b, p, boss, game);
     draw_level_label(b->buffer, game);
     draw_bonus_system(b->buffer, (Game *)game, assets);
@@ -209,33 +187,22 @@ void display_eclair(Bitmaps *b, Boss *boss, int active, int boss_active) {
     }
 }
 
-// Barre de PV du boss : imposante en haut de l'écran, pleine largeur avec marges
 void display_hud(Bitmaps *b, Player *p, Boss *boss, const Game *game) {
     if (game_is_boss(game)) {
-        // Barre de PV large en haut de l'écran
         int margin = 20;
         int bx = margin, by = 8;
         int bw = SCREEN_W - 2 * margin;
         int bh = 28;
-
-        // Fond sombre
         rectfill(b->buffer, bx - 3, by - 3, bx + bw + 3, by + bh + 3, makecol(10, 0, 0));
         rectfill(b->buffer, bx, by, bx + bw, by + bh, makecol(50, 0, 0));
-
-        // Remplissage proportionnel (modulaire : fonctionne pour n'importe quel pv_max)
         int larg = (boss->pv_max > 0) ? (int)((float)bw * boss->pv / boss->pv_max) : 0;
         if (larg < 0) larg = 0;
         if (larg > 0) {
             rectfill(b->buffer, bx, by,          bx + larg, by + bh,       makecol(180, 0, 0));
-            // Reflet supérieur
             rectfill(b->buffer, bx, by,          bx + larg, by + bh / 3,   makecol(255, 60, 60));
-            // Ombre inférieure
             rectfill(b->buffer, bx, by + bh - 4, bx + larg, by + bh,       makecol(100, 0, 0));
         }
-        // Bordure lumineuse
         rect(b->buffer, bx - 2, by - 2, bx + bw + 2, by + bh + 2, makecol(255, 80, 80));
-
-        // Texte "BOSS" centré dans la barre
         char pv_txt[32];
         snprintf(pv_txt, sizeof(pv_txt), "BOSS  %d / %d", (int)boss->pv, (int)boss->pv_max);
         int tw = text_length(font, pv_txt);
@@ -243,15 +210,12 @@ void display_hud(Bitmaps *b, Player *p, Boss *boss, const Game *game) {
                    bx + (bw - tw) / 2, by + (bh - text_height(font)) / 2,
                    makecol(255, 255, 255), -1);
     } else {
-        // Compteur d'astéroïdes restants
         char buf[32];
         AsteroidManager *am = (AsteroidManager *)&game->am;
         int remaining = am->count + (am->to_spawn - am->spawned);
         snprintf(buf, sizeof(buf), "Asteroides: %d", remaining);
         textout_ex(b->buffer, font, buf, 10, 10, makecol(255, 255, 255), -1);
     }
-
-    // Cœurs joueur
     for (int v = 0; v < 3; v++) {
         int hx = SCREEN_W - 20 - v * 28, hy = 48;
         int col  = (v < p->vies) ? makecol(255, 60, 100)  : makecol(80, 80, 80);
@@ -311,8 +275,6 @@ void draw_neon_circle(BITMAP *dest, int x, int y, int radius) {
     circle(dest, cx, cy, radius + 4, makecol(80,  80,  0));
     circle(dest, cx, cy, radius - 2, makecol(200, 200, 0));
 }
-
-// ── Cinématique inter-niveaux ────────────────────────────────────────────────
 
 void transition_reset(Transition *tr) {
     tr->phase         = TRANS_INACTIVE;
@@ -456,8 +418,6 @@ void display_transition(Transition *tr, Bitmaps *b, Assets *assets,
     blit(b->buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
-// ── Cinématique de victoire ──────────────────────────────────────────────────
-
 void victory_cinematic_reset(VictoryCinematic *vc) {
     vc->phase         = VICTORY_INACTIVE;
     vc->timer         = 0;
@@ -465,7 +425,6 @@ void victory_cinematic_reset(VictoryCinematic *vc) {
     vc->dialogue_done = 0;
 }
 
-// Démarre la cinématique : le boss vient d'être tué
 void victory_cinematic_start(VictoryCinematic *vc) {
     vc->phase         = VICTORY_BOSS_DYING;
     vc->timer         = 0;
@@ -473,12 +432,9 @@ void victory_cinematic_start(VictoryCinematic *vc) {
     vc->dialogue_done = 0;
 }
 
-// Met à jour la cinématique de victoire, retourne 1 tant qu'elle est active
 int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
                               Etoile *etoiles, int n_etoiles, float player_game_y) {
     if (vc->phase == VICTORY_INACTIVE) return 0;
-
-    // Avance les étoiles selon la vitesse courante
     for (int i = 0; i < n_etoiles; i++) {
         int dy = (int)(etoiles[i].vitesse * vc->star_speed);
         etoiles[i].y += dy;
@@ -491,7 +447,6 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
     switch (vc->phase) {
 
         case VICTORY_BOSS_DYING:
-            // boss.c gère le tremblement via boss->dying ; on attend death_done
             vc->timer++;
             if (boss->death_done) {
                 vc->phase = VICTORY_BOSS_EXPLODING;
@@ -500,9 +455,7 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             break;
 
         case VICTORY_BOSS_EXPLODING:
-            // La grande explosion est rendue dans victory_cinematic_draw
             vc->timer++;
-            // Après 50 frames (durée de l'animation d'explosion)
             if (vc->timer >= 50 * 5) {
                 vc->phase = VICTORY_WARP_CENTER;
                 vc->timer = 0;
@@ -516,13 +469,13 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             if (t > 1.0f) t = 1.0f;
             float ease   = 1.0f - (1.0f - t) * (1.0f - t);
             float target_x = (float)(SCREEN_W / 2 - 30);
-            float target_y = (float)(SCREEN_H / 3);        // ← centré en Y au tiers
+            float target_y = (float)(SCREEN_H / 3);
             p->x  = p->x + (target_x - p->x) * ease;
-            p->y  = p->y + (target_y - p->y) * ease;       // ← ajout du centrage Y
+            p->y  = p->y + (target_y - p->y) * ease;
             p->dx = 0.0f;
             if (vc->timer >= TRANS_CENTER_DUR) {
                 p->x      = target_x;
-                p->y      = target_y;                       // ← fixe la position finale
+                p->y      = target_y;
                 vc->phase = VICTORY_WARP_ACCEL;
                 vc->timer = 0;
             }
@@ -530,12 +483,9 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
         }
 
         case VICTORY_WARP_ACCEL:
-            // Accélération du parallax des étoiles : simulation de vitesse
             vc->timer++;
             vc->star_speed = 1.0f + ((float)vc->timer / 60.0f) * 5.0f;
             if (vc->star_speed > 8.0f) vc->star_speed = 8.0f;
-
-            // Après 90 frames, passage au dialogue
             if (vc->timer >= 90) {
                 vc->phase = VICTORY_DIALOGUE;
                 vc->timer = 0;
@@ -543,7 +493,6 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             break;
 
         case VICTORY_DIALOGUE:
-            // Attente du clic du joueur (géré dans main via victory_cinematic_draw)
             vc->timer++;
             if (vc->dialogue_done) {
                 vc->phase = VICTORY_SHIP_EXIT;
@@ -552,7 +501,6 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             break;
 
         case VICTORY_SHIP_EXIT:
-            // Le vaisseau monte et quitte l'écran vers le haut
             vc->timer++;
             p->y -= 8.0f;
             p->dx = 0.0f;
@@ -563,22 +511,15 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             break;
 
         case VICTORY_SCREEN:
-            // Écran de victoire : géré par ihm.c, on reste dans cet état
-            break;
-
         default:
             break;
     }
     return 1;
 }
-
-// Rendu de la cinématique de victoire
 void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
 Player *p, Boss *boss, Etoile *etoiles, int n_etoiles,
 Audio *audio) {
     clear_to_color(b->buffer, makecol(10, 10, 20));
-
-    // Fond étoilé commun à toutes les phases
     for (int i = 0; i < n_etoiles; i++) {
         int gris = etoiles[i].luminosite;
         putpixel(b->buffer, etoiles[i].x, etoiles[i].y, makecol(gris, gris, gris));
@@ -587,7 +528,6 @@ Audio *audio) {
     switch (vc->phase) {
 
         case VICTORY_BOSS_DYING:
-            // Le boss tremble avec des mini-explosions
             if (boss->active || boss->dying) {
                 int draw_x = (int)(boss->x + boss->shake_x);
                 masked_blit(assets->boss, b->buffer, 0, 0, draw_x, boss->y, SCREEN_W, SCREEN_H);
@@ -604,7 +544,6 @@ Audio *audio) {
             break;
 
         case VICTORY_BOSS_EXPLODING: {
-            // Grande explosion finale
             int frame = (vc->timer / 5) % 50;
             int c   = frame % 10;
             int row = frame / 10;
@@ -616,7 +555,6 @@ Audio *audio) {
 
         case VICTORY_WARP_CENTER:
         case VICTORY_WARP_ACCEL:
-            // Vaisseau visible, étoiles en accélération
             if (p->y > -84.0f && p->y < (float)SCREEN_H)
                 draw_player_ship(b->buffer, p, assets);
             break;
@@ -628,10 +566,7 @@ Audio *audio) {
                 speech8_joue = 1;
             }
             if (vc->dialogue_done) speech8_joue = 0;
-            // Étoiles rapides + vaisseau centré + dialogue Claude
             draw_player_ship(b->buffer, p, assets);
-
-            // Panneau de dialogue en bas de l'écran
             int px = (int)(SCREEN_W * 0.025f);
             int py = (int)(SCREEN_H * 0.817f);
             stretch_sprite(b->buffer, assets->claude, px, py,
@@ -643,8 +578,6 @@ Audio *audio) {
             int bh = (int)(SCREEN_H * 0.12f);
             rectfill(b->buffer, bx, by2, bx + bw, by2 + bh, makecol(20, 20, 50));
             rect(b->buffer,     bx, by2, bx + bw, by2 + bh, makecol(100, 150, 255));
-
-            // Texte du dialogue
             const char *msg1 = "Bravo, la mission est un succes !";
             const char *msg2 = "[ Cliquez pour continuer ]";
             int tw1 = text_length(font, msg1);
@@ -671,15 +604,11 @@ Audio *audio) {
         }
 
         case VICTORY_SHIP_EXIT:
-            // Vaisseau remonte et quitte l'écran
             if (p->y > -100.0f)
                 draw_player_ship(b->buffer, p, assets);
             break;
 
         case VICTORY_SCREEN:
-            // Rien de spécial : l'écran de victoire est dessiné par ihm.c
-            break;
-
         default:
             break;
     }
@@ -709,19 +638,13 @@ void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
     int sy[] = {336, 328, 368, 416};
     int sw[] = {48, 47, 47, 47};
     int sh[] = {64, 63, 40, 31};
-
-    // Claude en bas à gauche
     stretch_sprite(buffer, assets->claude, LX(0.025), LY(0.817), LX(CLAUDE_L), LY(CLAUDE_H));
-
-    // Vaisseau centré
     int v_w = LX(VAISSEAU_L);
     int v_h = LY(VAISSEAU_H);
     masked_stretch_blit(assets->player_sprites,
                         buffer,
                         sx[p->skin_id], sy[p->skin_id], sw[p->skin_id], sh[p->skin_id],
                         LX(0.5) - v_w/2, LY(0.5) - v_h/2, v_w, v_h);
-
-    // ── Phase 0 ─────────────────────────────────────────────────────────────
     if (d->phase == 0) {
         if (d->premier_affichage) {
             audio_play_speech6(audio);
@@ -739,8 +662,6 @@ void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets,
             d->phase             = 1;
             d->premier_affichage = 0;
         }
-
-    // ── Phase 1 ─────────────────────────────────────────────────────────────
     } else if (d->phase == 1) {
         ecrire_texte(buffer, "Ne vous inquietez pas, nous allons vous rapatrier...",
                      LX(0.188), LY(0.850), makecol(255, 255, 255), 1.7);

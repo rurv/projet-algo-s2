@@ -1,14 +1,12 @@
-
 #include "../headers/assets.h"
 #include <stdio.h>
 
-// chemins des sprites d'asteroides
 static const char *asteroid_paths[NB_ASTEROID_SPRITES] = {
     "assets/images/sprites_asteroid.bmp",
     "assets/images/sprites_asteroid2.bmp",
     "assets/images/sprites_asteroid3.bmp"
 };
-// chemins alternatifs
+
 static const char *asteroid_paths_fb[NB_ASTEROID_SPRITES] = {
     "../assets/images/sprites_asteroid.bmp",
     "../assets/images/sprites_asteroid2.bmp",
@@ -25,9 +23,7 @@ void load_assets (Assets *a) {
     a->sol_sprites[1] = load_bitmap("assets/images/sol_cristal.bmp", NULL);
     a->sol_sprites[2] = load_bitmap("assets/images/sol_volcan.bmp", NULL);
     a->clavier         = load_bitmap("assets/images/clavier.bmp", NULL);
-    // chargement des sprites d'asteroide
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) a->asteroid_sprites[i] = load_bitmap(asteroid_paths[i], NULL);
-    // chargement des chemins alternatifs en cas d'erreur
     if (!a->player_sprites) {
         a->player_sprites = load_bitmap("../assets/images/sprites_ships.bmp", NULL);
         if (!a->player_sprites) {
@@ -100,7 +96,6 @@ void load_assets (Assets *a) {
             exit(1);
         }
     }
-    // chemin alternatif pour chaque asteroide
     for (int i = 0; i < NB_ASTEROID_SPRITES; i++) {
         if (!a->asteroid_sprites[i]) {
             a->asteroid_sprites[i] = load_bitmap(asteroid_paths_fb[i], NULL);
