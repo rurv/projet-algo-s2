@@ -209,8 +209,11 @@ int main() {
                     victory.dialogue_done = 1;
 
                 // Avancement et rendu de la cinématique
+                VictoryPhase phase_avant = victory.phase;
                 victory_cinematic_update(&victory, &player, &boss,
                                          etoiles, NOMBRE_ETOILES, player_game_y);
+                if (phase_avant == VICTORY_BOSS_DYING && victory.phase == VICTORY_BOSS_EXPLODING)
+                    audio_play_explode(&audio);
                 victory_cinematic_draw(&victory, &bmps, &assets, &player,
                                        &boss, etoiles, NOMBRE_ETOILES);
 

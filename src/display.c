@@ -511,16 +511,18 @@ int victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
             break;
 
         case VICTORY_WARP_CENTER: {
-            // Centrage progressif du vaisseau
             vc->timer++;
             float t      = (float)vc->timer / TRANS_CENTER_DUR;
             if (t > 1.0f) t = 1.0f;
             float ease   = 1.0f - (1.0f - t) * (1.0f - t);
-            float target = (float)(SCREEN_W / 2 - 30);
-            p->x  = p->x + (target - p->x) * ease;
+            float target_x = (float)(SCREEN_W / 2 - 30);
+            float target_y = (float)(SCREEN_H / 3);        // ← centré en Y au tiers
+            p->x  = p->x + (target_x - p->x) * ease;
+            p->y  = p->y + (target_y - p->y) * ease;       // ← ajout du centrage Y
             p->dx = 0.0f;
             if (vc->timer >= TRANS_CENTER_DUR) {
-                p->x      = target;
+                p->x      = target_x;
+                p->y      = target_y;                       // ← fixe la position finale
                 vc->phase = VICTORY_WARP_ACCEL;
                 vc->timer = 0;
             }
