@@ -4,10 +4,9 @@
 
 #include <allegro.h>
 
-// Nombre de sprites d'astéroïdes (un par niveau non-boss)
-#define NB_ASTEROID_SPRITES 3
+#define NB_ASTEROID_SPRITES 3   // nombre de sprites d'asteroides
 
-// structure qui stocke tous les assets du jeu
+// structure qui contient les assets
 typedef struct Assets {
     BITMAP *bg1;
     BITMAP *bg2;
@@ -22,8 +21,6 @@ typedef struct Assets {
     BITMAP *claude;
     BITMAP *sol_sprites[3];
 } Assets;
-
-
 
 void load_assets (Assets *a);   // chargement des assets
 void free_assets (Assets *a);   // liberation des assets

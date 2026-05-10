@@ -3,12 +3,12 @@
 
 #include <allegro.h>
 
-
 #define MAX_ASTEROIDS   32
 #define MIN_ASTEROID_SIZE 20
 
 typedef struct Game Game;
 
+// structure des asteroides
 typedef struct Asteroid {
     float x, y;
     float dx, dy;
@@ -17,6 +17,7 @@ typedef struct Asteroid {
     int   frame, frame_timer;
 } Asteroid;
 
+// structure de gestion des asteroides
 typedef struct AsteroidManager {
     Asteroid asteroids[MAX_ASTEROIDS];
     int     count;
@@ -27,10 +28,13 @@ typedef struct AsteroidManager {
     float   max_size;
 } AsteroidManager;
 
-void  asteroids_init(AsteroidManager *am, float gravity, int to_spawn, float max_size);
-void  asteroids_update(AsteroidManager *am);
-void  asteroids_draw(BITMAP *sprite, BITMAP *buffer, AsteroidManager *am);
-void  asteroid_split(AsteroidManager *am, int idx, Game *g);
-int   asteroids_all_dead(const AsteroidManager *am);
+int     ground_y(void); // calcul de la hauteur du sol en fonction des dimensions de l'ecran
+void    draw_asteroid(BITMAP *sprite, BITMAP *buf, float cx, float cy, float r, int frame); // calcul des dimensions des asteroides
+void    spawn_one(AsteroidManager *am); // spawn d'un asteroide
+void    asteroids_init(AsteroidManager *am, float gravity, int to_spawn, float max_size);   // initialisation des asteroides
+void    asteroids_update(AsteroidManager *am);                                // mise à jour des asteroides
+void    asteroids_draw(BITMAP *sprite, BITMAP *buffer, AsteroidManager *am);  // affichage des asteroides
+void    asteroid_split(AsteroidManager *am, int idx, Game *g);                // division des asteroides
+int     asteroids_all_dead(const AsteroidManager *am);                        // verification de la condition de victoire
 
 #endif

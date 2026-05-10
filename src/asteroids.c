@@ -4,33 +4,24 @@
 #include <math.h>
 #include "../headers/game.h"
 
-static int ground_y(void) {
+int ground_y(void) {
     return SCREEN_HEIGHT / 5 * 4 + 84;
 }
 
-/* Dessine le sprite 128x128 centré sur (cx, cy), mis à l'échelle selon le rayon */
-static void draw_asteroid(BITMAP *sprite, BITMAP *buf, float cx, float cy, float r, int frame) {
+void draw_asteroid(BITMAP *sprite, BITMAP *buf, float cx, float cy, float r, int frame) {
     int size = (int)(r * 2);
     if (size < 2) size = 2;
-
-    if (sprite) {
-        /* Le sprite existe : on l'étire, fond magenta masqué */
-        masked_stretch_blit(sprite, buf,
-                        frame*128, 0, 128, 128,
-                        (int)(cx - r), (int)(cy - r), size, size);
-    } else {
-        /* Fallback cercle marron si sprite absent */
+    if (sprite) masked_stretch_blit(sprite, buf, frame*128, 0, 128, 128, (int)(cx - r), (int)(cy - r), size, size);
+    else {
         circlefill(buf, (int)cx, (int)cy, (int)r, makecol(139, 90, 43));
-        circle(buf,     (int)cx, (int)cy, (int)r, makecol(80, 50, 20));
+        circle(buf, (int)cx, (int)cy, (int)r, makecol(80, 50, 20));
     }
 }
 
-static void spawn_one(AsteroidManager *am) {
+void spawn_one(AsteroidManager *am) {
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (am->asteroids[i].active) continue;
         Asteroid *a = &am->asteroids[i];
-
-        /* Rayon entre 0.5*max_size et 2*max_size */
         float min_r = am->max_size * 0.5f;
         float max_r = am->max_size * 2.0f;
         a->radius = min_r + (rand() % 1000) / 1000.0f * (max_r - min_r);
