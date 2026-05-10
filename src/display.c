@@ -165,7 +165,7 @@ void display(Bitmaps *b, Assets *assets, Player *p, Boss *boss, const Game *game
     }
 
     // Grande explosion finale du boss
-    if (game_is_boss(game) && boss->pv <= 0 && !boss->dying) {
+    if (game_is_boss(game) && boss->pv <= 0 && !boss->dying && boss->death_done) {
         boss->active = 0;
         boss->exp_timer++;
         if (boss->exp_timer >= 5) { boss->exp_timer = 0; boss->exp_frame++; }
