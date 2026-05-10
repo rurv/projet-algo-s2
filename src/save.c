@@ -37,11 +37,10 @@ int save_exists(void) {
 }
 
 // Sauvegarde l'état actuel de la partie dans un fichier texte lisible
-// Retourne 1 si succès, 0 si échec
 int save_game(const Player *p, const Game *game) {
     const char *path = write_path();
     FILE *f = fopen(path, "w");
-    if (!f) return 0;
+    if (!f) return 0; //Retourne 0 si échec
 
     fprintf(f, "%s\n",  SAVE_MAGIC);
     fprintf(f, "%d\n",  game_level_index(game));
@@ -50,17 +49,17 @@ int save_game(const Player *p, const Game *game) {
     fprintf(f, "%s\n",  p->pseudo);
 
     fclose(f);
-    return 1;
+    return 1; // Retourne 1 si succès
 }
 
 // Charge une sauvegarde et applique les données au joueur et au jeu
-// Retourne 1 si succès, 0 si échec ou sauvegarde corrompue
+
 int load_game(Player *p, Game *game, Boss *boss) {
     const char *path = save_path();
-    if (!path) return 0;
+    if (!path) return 0;  //retourne 0 si échec
 
     FILE *f = fopen(path, "r");
-    if (!f) return 0;
+    if (!f) return 0;//retourne 0 si échec
 
     SaveData sd;
     int ok = 1;
@@ -89,7 +88,7 @@ int load_game(Player *p, Game *game, Boss *boss) {
     for (int i = 0; i < sd.level_index && i < game->nlevels - 1; i++)
         game_next_level(game, boss);
 
-    return 1;
+    return 1;// Retourne 1 si succès
 }
 
 // Supprime le fichier de sauvegarde

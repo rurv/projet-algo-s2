@@ -33,8 +33,6 @@ typedef struct Boss {
     float pv;
     float pv_max;
     int active;
-    int warning;
-    int warning_timer;
     int shoot_timer;
     float vmax;
     Eclair *eclairs;
@@ -71,8 +69,5 @@ void boss_init(Boss *b);
 void boss_move_right(Boss *b);
 void boss_move_left(Boss *b);
 void boss_update(Boss *b);
-void boss_shoot(Boss *b);
-void boss_draw(BITMAP *buffer, Boss *b);
-void boss_destroy(Boss *b);
 
 #endif //PROJET_ALGO_S2_BOSS_H
