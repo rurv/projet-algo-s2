@@ -42,6 +42,15 @@ int main() {
     Transition trans;
     transition_reset(&trans);
 
+    // Cinématique de victoire
+    VictoryCinematic victory;
+    victory_cinematic_reset(&victory);
+
+    // Dialogue game over
+    GameOverDialogue go_dialogue;
+    go_dialogue.active     = 0;
+    go_dialogue.done       = 1;    // inactif par défaut
+
     Etoile etoiles[NOMBRE_ETOILES];
     for (int i = 0; i < NOMBRE_ETOILES; i++) {
         etoiles[i].x         = rand() % SCREEN_WIDTH;
@@ -52,7 +61,7 @@ int main() {
 
     while (!quitter && !key[KEY_ESC]) {
 
-        // ── Fond étoilé (menus et cinématique) ───────────────────────────────
+        // Fond étoilé pour tous les écrans hors JEU normal
         if (ecran != JEU || trans.phase != TRANS_INACTIVE) {
             if (ecran != JEU)
                 clear_to_color(bmps.buffer, makecol(10, 10, 20));
@@ -72,38 +81,41 @@ int main() {
             case MENU_PRINCIPAL:
                 ecran = menu_principale(ecran, bmps.buffer);
                 break;
+
             case SAISIE_PSEUDO:
                 ecran = saisie_pseudo(ecran, bmps.buffer, &player);
                 break;
+
             case REGLE:
                 ecran = regles(ecran, bmps.buffer);
                 break;
+
             case CHOIX:
                 ecran = choix(ecran, bmps.buffer, &assets, &player);
                 break;
+
             case DECOMPTE:
                 ecran = decompte(ecran, bmps.buffer, &assets, &player, &audio);
                 break;
 
             case JEU: {
-                // ── Game Over ────────────────────────────────────────────────
+                // Game Over : joueur à 0 vie
                 if (player.vies <= 0) {
                     audio_stop_boss_eclair(&audio);
                     transition_reset(&trans);
+                    gameover_dialogue_reset(&go_dialogue);
                     ecran = GAME_OVER;
                     break;
                 }
 
-                // ── Déclenchement cinématique ────────────────────────────────
+                // Déclenchement cinématique inter-niveaux
                 if (game.level_complete && trans.phase == TRANS_INACTIVE)
                     transition_start(&trans);
 
                 int controls_locked = (trans.phase != TRANS_INACTIVE);
 
-                // ── Avance la cinématique ────────────────────────────────────
+                // Avancement cinématique inter-niveaux
                 if (controls_locked) {
-                    // transition_update retourne 0 quand elle vient de se terminer,
-                    // on appelle quand même display_transition cette frame pour la sync
                     transition_update(&trans, &player, &game, &boss,
                                       &boss_dead_sound, player_game_y);
                     for (int i = 0; i < player.laser_count; i++)
@@ -114,7 +126,27 @@ int main() {
                     break;
                 }
 
-                // ── Contrôles ────────────────────────────────────────────────
+                // Détection de la mort du boss : lancement de la séquence de mort
+                if (game_is_boss(&game) && boss.pv <= 0
+                        && !boss.dying && !boss.death_done && boss.active) {
+                    boss.dying          = 1;
+                    boss.die_timer      = 0;
+                    boss.exp_mini_timer = 20;
+                    // Joue le son d'explosion pour la séquence de tremblement
+                    audio_play_explode(&audio);
+                }
+
+                // Une fois la séquence de mort terminée : lancement cinématique victoire
+                if (game_is_boss(&game) && boss.death_done
+                        && victory.phase == VICTORY_INACTIVE) {
+                    audio_stop_boss_eclair(&audio);
+                    boss_dead_sound = 1;
+                    victory_cinematic_start(&victory);
+                    ecran = VICTOIRE_CINEMA;
+                    break;
+                }
+
+                // Contrôles pendant le jeu normal
                 if (key[KEY_P]) {
                     while (key[KEY_P]) rest(1);
                     ecran = PAUSE;
@@ -136,10 +168,10 @@ int main() {
                                 for (int i = 0; i < player.laser_count && tirs_supp < 2; i++) {
                                     if (!player.lasers[i].active) {
                                         player.lasers[i].active = 1;
-                                        player.lasers[i].y  = player.y;
-                                        player.lasers[i].dy = -25.0f;
-                                        player.lasers[i].x  = (tirs_supp == 0) ? player.x + 10 : player.x + 40;
-                                        player.lasers[i].dx = (tirs_supp == 0) ? -7.0f : 7.0f;
+                                        player.lasers[i].y      = player.y;
+                                        player.lasers[i].dy     = -25.0f;
+                                        player.lasers[i].x      = (tirs_supp == 0) ? player.x + 10 : player.x + 40;
+                                        player.lasers[i].dx     = (tirs_supp == 0) ? -7.0f : 7.0f;
                                         tirs_supp++;
                                     }
                                 }
@@ -152,20 +184,60 @@ int main() {
                     space_pressed = 0;
                 }
 
-                // ── Mise à jour jeu ──────────────────────────────────────────
+                // Mise à jour logique du jeu
                 game_update(&player, &boss, &game, &audio);
                 colision_asteroids_player(&player, &game.am, &audio);
+
                 if (boss.pv <= 0 && !boss_dead_sound && game_is_boss(&game)) {
                     audio_play_explode(&audio);
                     boss_dead_sound = 1;
                 }
 
-                // ── Rendu normal ─────────────────────────────────────────────
+                // Rendu du jeu normal
                 display(&bmps, &assets, &player, &boss, &game);
                 draw_bonus_system(bmps.buffer, &game, &assets);
                 rest(1);
                 break;
             }
+
+            case VICTOIRE_CINEMA: {
+                // Contrôles bloqués pendant la cinématique de victoire
+                clear_to_color(bmps.buffer, makecol(10, 10, 20));
+
+                // Détection clic pour passer le dialogue
+                if (victory.phase == VICTORY_DIALOGUE && (mouse_b & 1))
+                    victory.dialogue_done = 1;
+
+                // Avancement et rendu de la cinématique
+                victory_cinematic_update(&victory, &player, &boss,
+                                         etoiles, NOMBRE_ETOILES, player_game_y);
+                victory_cinematic_draw(&victory, &bmps, &assets, &player,
+                                       &boss, etoiles, NOMBRE_ETOILES);
+
+                // Passage à l'écran de victoire une fois la cinématique terminée
+                if (victory.phase == VICTORY_SCREEN)
+                    ecran = VICTOIRE;
+
+                show_mouse(bmps.buffer);
+                blit(bmps.buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                rest(1);
+                continue;   // on skip le blit final en bas
+            }
+
+            case VICTOIRE:
+                ecran = victory_screen(ecran, bmps.buffer, &player);
+                if (ecran == CHOIX) {
+                    // Réinitialisation complète pour une nouvelle partie
+                    player_init(&player);
+                    boss_init(&boss);
+                    boss.active = 0;
+                    game            = init_game();
+                    boss_dead_sound = 0;
+                    transition_reset(&trans);
+                    victory_cinematic_reset(&victory);
+                    save_delete();
+                }
+                break;
 
             case PAUSE:
                 ecran = pause_level(ecran, bmps.buffer);
@@ -186,14 +258,17 @@ int main() {
                 break;
 
             case GAME_OVER:
-                ecran = game_over_screen(ecran, bmps.buffer, &player);
+                ecran = game_over_screen(ecran, bmps.buffer, &player,
+                                         &go_dialogue, &assets);
                 if (ecran == CHOIX) {
+                    // Réinitialisation complète
                     player_init(&player);
                     boss_init(&boss);
                     boss.active     = 0;
                     game            = init_game();
                     boss_dead_sound = 0;
                     transition_reset(&trans);
+                    victory_cinematic_reset(&victory);
                     save_delete();
                 }
                 break;
@@ -204,7 +279,7 @@ int main() {
                 break;
         }
 
-        if (!quitter && ecran != JEU) {
+        if (!quitter && ecran != JEU && ecran != VICTOIRE_CINEMA) {
             show_mouse(bmps.buffer);
             blit(bmps.buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         }

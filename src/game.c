@@ -71,11 +71,11 @@ Game init_game(void) {
     for (int i = 0; i < nlevels - 1; i++)
         levels[i]->next_level = levels[i + 1];
 
-    game.levels        = levels;
-    game.nlevels       = nlevels;
-    game.current_level = levels[0];
-    game.bonus.actif = 0;
-    game.bonus_timer = 0;
+    game.levels         = levels;
+    game.nlevels        = nlevels;
+    game.current_level  = levels[0];
+    game.bonus.actif    = 0;
+    game.bonus_timer    = 0;
     game.level_complete = 0;
 
     load_level_asteroids(&game);
@@ -99,12 +99,16 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
         asteroids_update(&game->am);
         colision_laser_asteroids(player, game, audio);
 
-        // Passage automatique quand tous les astéroïdes sont détruits
         if (asteroids_all_dead(&game->am) && !game->level_complete)
             game->level_complete = 1;
     } else {
-        boss_update(boss);
-        colision(player, boss);
+        // Ne pas mettre à jour le boss s'il est déjà mort ou en train de mourir
+        if (boss->active && boss->pv > 0 && !boss->dying)
+            boss_update(boss);
+        else if (boss->dying)
+            boss_update(boss);   // boss_update gère la séquence de mort
+
+        colision(player, boss, game);
         colision_eclair(player, boss);
 
         static int eclair_jouait = 0;
@@ -120,7 +124,7 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
                 eclair_jouait = 0;
             }
         }
-        if (boss->pv <= 0) {
+        if (boss->pv <= 0 && !boss->dying && !boss->death_done) {
             if (eclair_jouait) {
                 audio_stop_boss_eclair(audio);
                 eclair_jouait = 0;
@@ -131,7 +135,6 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
     if (key[KEY_LEFT])  player_move_left(player);
     if (key[KEY_RIGHT]) player_move_right(player);
 
-    // Touche O : niveau suivant (debug, anti-répétition)
     if (key[KEY_O]) {
         if (!game->key_o_pressed) {
             game_next_level(game, boss);
@@ -142,7 +145,18 @@ void game_update(Player *player, Boss *boss, Game *game, Audio *audio) {
     }
 }
 
-void colision(Player *player, Boss *boss) {
+// Spawn un power-up à la position donnée si aucun n'est déjà actif
+void spawn_boss_bonus(Game *g, float x, float y) {
+    if (g->bonus.actif) return;
+    g->bonus.actif      = 1;
+    g->bonus.en_attente = 0;
+    g->bonus.x          = x;
+    g->bonus.y          = y;
+    g->bonus.type       = (rand() % 2 == 0) ? TRIPLE_LASER : INVINCIBILITE;
+}
+
+// Collision laser/boss avec 5% de chance de power-up à chaque touche
+void colision(Player *player, Boss *boss, Game *game) {
     for (int i = 0; i < player->laser_count; i++) {
         if (!player->lasers[i].active) continue;
         if (player->lasers[i].x >= boss->x &&
@@ -152,6 +166,10 @@ void colision(Player *player, Boss *boss) {
             player->lasers[i].active = 0;
             boss->pv -= 10;
             if (boss->pv <= 0) boss->pv = 0;
+
+            // 5% de chance de faire tomber un power-up
+            if (rand() % 100 < 5)
+                spawn_boss_bonus(game, boss->x + rand() % 280 + 10, boss->y + 100);
         }
     }
 }
@@ -164,13 +182,13 @@ void colision_eclair(Player *player, Boss *boss) {
         return;
     }
     int eclair_x1 = boss->x + 100, eclair_x2 = boss->x + 200;
-    int p_left = player->x + 15, p_right = player->x + 45;
+    int p_left    = player->x + 15, p_right = player->x + 45;
     if (player->y >= 160) {
         if ((p_right >= eclair_x1 - 15 && p_left <= eclair_x1 + 15) ||
             (p_right >= eclair_x2 - 15 && p_left <= eclair_x2 + 15)) {
             player->vies--;
             if (player->vies < 0) player->vies = 0;
-            player->invincible = 1;
+            player->invincible       = 1;
             player->invincible_timer = 120;
         }
     }
@@ -183,10 +201,10 @@ void colision_laser_asteroids(Player *player, Game *game, Audio *audio) {
         float lx = player->lasers[l].x, ly = player->lasers[l].y;
         for (int a = 0; a < MAX_ASTEROIDS; a++) {
             if (!am->asteroids[a].active) continue;
-            float dx = lx - am->asteroids[a].x;
-            float dy = ly - am->asteroids[a].y;
-            float dist2 = dx*dx + dy*dy;
-            float r = am->asteroids[a].radius;
+            float dx    = lx - am->asteroids[a].x;
+            float dy    = ly - am->asteroids[a].y;
+            float dist2 = dx * dx + dy * dy;
+            float r     = am->asteroids[a].radius;
             if (dist2 <= r * r) {
                 player->lasers[l].active = 0;
                 asteroid_split(am, a, game);
@@ -198,46 +216,30 @@ void colision_laser_asteroids(Player *player, Game *game, Audio *audio) {
 }
 
 void colision_asteroids_player(Player *p, AsteroidManager *am, Audio *audio) {
-    // 1. On définit le centre et le rayon du vaisseau
-    // On centre le cercle sur le milieu du sprite (vaisseau de ~60x80)
     float p_centerX = p->x + 30;
     float p_centerY = p->y + 40;
-    float p_radius  = 25.0f; // Rayon de collision du vaisseau
+    float p_radius  = 25.0f;
 
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
-        if (am->asteroids[i].active) {
-            Asteroid *a = &am->asteroids[i];
+        if (!am->asteroids[i].active) continue;
+        Asteroid *a = &am->asteroids[i];
+        float dx                = p_centerX - a->x;
+        float dy                = p_centerY - a->y;
+        float distance_au_carre = dx * dx + dy * dy;
+        float somme_rayons      = p_radius + a->radius;
+        float seuil_collision   = somme_rayons * somme_rayons;
 
-            // 2. Calcul du vecteur entre les deux centres
-            float dx = p_centerX - a->x;
-            float dy = p_centerY - a->y;
-
-            // 3. Calcul de la distance au carré : d² = dx² + dy²
-            float distance_au_carre = (dx * dx) + (dy * dy);
-
-            // 4. Somme des rayons au carré : (r1 + r2)²
-            float somme_rayons = p_radius + a->radius;
-            float seuil_collision = somme_rayons * somme_rayons;
-
-            // 5. Test de collision
-            if (distance_au_carre < seuil_collision) {
-
-                // Si pas invincible, on prend cher
-                if (!p->invincible) {
-                    p->vies--;
-                    audio_play_hit(audio);
-                    // Invincibilité de sécurité (clignotement)
-                    p->invincible = 1;
-                    p->invincible_timer = 120;
-                }
-                else {
-                    audio_play_hit_laser(audio); // uniquement quand le bouclier est activé
-                }
-
-                // L'astéroïde explose dans tous les cas
-                a->active = 0;
-                am->count--;
+        if (distance_au_carre < seuil_collision) {
+            if (!p->invincible) {
+                p->vies--;
+                audio_play_hit(audio);
+                p->invincible       = 1;
+                p->invincible_timer = 120;
+            } else {
+                audio_play_hit_laser(audio);
             }
+            a->active = 0;
+            am->count--;
         }
     }
 }
@@ -245,36 +247,32 @@ void colision_asteroids_player(Player *p, AsteroidManager *am, Audio *audio) {
 void update_game_bonus(Game *g, Player *p) {
     if (!g->bonus.actif) return;
 
-    // 1. Descente de la boule style Neon
     if (!g->bonus.en_attente) {
-        g->bonus.y += 3.0f; // Vitesse de descente
-        if (g->bonus.y >= p->y+60) {
-            g->bonus.y = p->y+60;
+        g->bonus.y += 3.0f;
+        if (g->bonus.y >= p->y + 60) {
+            g->bonus.y        = p->y + 60;
             g->bonus.en_attente = 1;
-            g->bonus.timer_vie = 180; // 3 secondes à 60 FPS
+            g->bonus.timer_vie  = 180;
         }
     } else {
-        // 2. Attente de 3 secondes au niveau du vaisseau
         g->bonus.timer_vie--;
         if (g->bonus.timer_vie <= 0) g->bonus.actif = 0;
     }
 
-    // 3. Collision avec le vaisseau pour ramasser
-    float dist_x = abs(g->bonus.x - (p->x + 30)); // 30 = milieu du vaisseau
+    float dist_x = abs(g->bonus.x - (p->x + 30));
     float dist_y = abs(g->bonus.y - (p->y + 30));
     if (dist_x < 50 && dist_y < 50) {
         g->bonus_actif = g->bonus.type;
         if (g->bonus_actif == INVINCIBILITE) {
-            p->invincible = 1;
-            g->bonus_timer = 600;        // Le bonus dure 10 secondes
+            p->invincible  = 1;
+            g->bonus_timer = 600;
         }
         if (g->bonus_actif == TRIPLE_LASER) {
-            g->bonus_timer = 200;
-            p->invincible = 0;
-            p->invincible_timer = 0;
+            g->bonus_timer       = 200;
+            p->invincible        = 0;
+            p->invincible_timer  = 0;
         }
         g->bonus.actif = 0;
-
     }
 }
 
@@ -282,24 +280,20 @@ void apply_bonus_effects(Game *g, Player *p) {
     if (g->bonus_timer > 0) {
         g->bonus_timer--;
 
-        // Effet Triple Laser (à appeler quand on appuie sur Espace)
-        // Note : Cette logique est à insérer dans ta fonction player_shot ou ici
         if (g->bonus_actif == TRIPLE_LASER && key[KEY_SPACE]) {
-            // On force le tir diagonal en modifiant les lasers libres
             int tirs_faits = 0;
             for (int i = 0; i < p->laser_count && tirs_faits < 2; i++) {
                 if (!p->lasers[i].active) {
-                    p->lasers[i].x = p->x + 24;
-                    p->lasers[i].y = p->y;
-                    p->lasers[i].dy = -25.0f;
-                    p->lasers[i].dx = (tirs_faits == 0) ? -5.0f : 5.0f; // Diagonales
+                    p->lasers[i].x      = p->x + 24;
+                    p->lasers[i].y      = p->y;
+                    p->lasers[i].dy     = -25.0f;
+                    p->lasers[i].dx     = (tirs_faits == 0) ? -5.0f : 5.0f;
                     p->lasers[i].active = 1;
                     tirs_faits++;
                 }
             }
         }
     } else {
-        // Fin des bonus
         if (g->bonus_actif == INVINCIBILITE) p->invincible = 0;
         g->bonus_actif = AUCUN_BONUS;
     }

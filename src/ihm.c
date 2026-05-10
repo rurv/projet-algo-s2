@@ -373,7 +373,13 @@ enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer) {
     return ecran;
 }
 
-enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p) {
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p, GameOverDialogue *dialogue, Assets *assets) {
+    // Show dialogue first, then the game over screen once it's done
+    if (!dialogue->done) {
+        gameover_dialogue_draw(buffer, dialogue, assets, p);
+        gameover_dialogue_update(dialogue);
+        return ecran;
+    }
     // Titre "GAME OVER"
     ecrire_centre_texte(buffer, "GAME OVER", SCREEN_WIDTH / 2, LY(0.15), makecol(220, 30, 30), 9);
 
@@ -413,6 +419,35 @@ enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player
                            ATTENDRE_RELACHE();
                            return QUITTER;
                                   }
+    }
+    return ecran;
+}
+
+enum EcranActuel victory_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p) {
+    ecrire_centre_texte(buffer, "VICTOIRE !", SCREEN_WIDTH / 2, LY(0.15), makecol(255, 215, 0), 9);
+
+    char msg[40];
+    snprintf(msg, sizeof(msg), "Bravo %s, mission accomplie !", p->pseudo);
+    ecrire_centre_texte(buffer, msg, SCREEN_WIDTH / 2, LY(0.35), makecol(200, 200, 200), 2);
+
+    // Bouton "Rejouer"
+    rectfill(buffer, LX(0.3125), LY(0.50), LX(0.6875), LY(0.58), makecol(40, 80, 40));
+    ecrire_centre_texte(buffer, "Rejouer", SCREEN_WIDTH / 2, LY(0.52), makecol(255, 255, 255), 4);
+
+    // Bouton "Quitter"
+    rectfill(buffer, LX(0.3125), LY(0.63), LX(0.6875), LY(0.71), makecol(50, 20, 20));
+    ecrire_centre_texte(buffer, "Quitter", SCREEN_WIDTH / 2, LY(0.65), makecol(200, 200, 200), 4);
+
+    if (mouse_b & 1) {
+        if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+            mouse_y > LY(0.50)   && mouse_y < LY(0.58)) {
+            ATTENDRE_RELACHE();
+            return CHOIX;
+            } else if (mouse_x > LX(0.3125) && mouse_x < LX(0.6875) &&
+                       mouse_y > LY(0.63)   && mouse_y < LY(0.71)) {
+                ATTENDRE_RELACHE();
+                return QUITTER;
+                       }
     }
     return ecran;
 }
