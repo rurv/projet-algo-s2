@@ -8,15 +8,13 @@
 #include "boss.h"
 #include "game.h"
 
-// Etoile est définie ici car utilisée à la fois par le rendu (display)
-// et par la boucle principale (main). ihm.h ne l'inclut plus.
 typedef struct {
     int x, y;
     int vitesse;
     int luminosite;
 } Etoile;
 
-enum SkinActuelle {VAISSEAU1, VAISSEAU2, VAISSEAU3, VAISSEAU4};
+enum SkinActuelle { VAISSEAU1, VAISSEAU2, VAISSEAU3, VAISSEAU4 };
 
 typedef struct Bitmaps {
     BITMAP *buffer;
@@ -51,6 +49,33 @@ typedef struct {
 #define TRANS_ARRIVE_DUR  70
 #define TRANS_DESCEND_DUR 80
 
+// ── Cinématique de victoire ──────────────────────────────────────────────────
+typedef enum {
+    VICTORY_INACTIVE = 0,
+    VICTORY_BOSS_DYING,      // tremblement du boss + mini-explosions (géré dans boss.c)
+    VICTORY_BOSS_EXPLODING,  // grande explosion finale du boss
+    VICTORY_WARP_CENTER,     // vaisseau se centre
+    VICTORY_WARP_ACCEL,      // accélération des étoiles
+    VICTORY_DIALOGUE,        // dialogue avec Claude
+    VICTORY_SHIP_EXIT,       // vaisseau quitte l'écran vers le haut
+    VICTORY_SCREEN,          // écran de victoire final
+} VictoryPhase;
+
+typedef struct {
+    VictoryPhase phase;
+    int  timer;
+    float star_speed;
+    int  dialogue_done;     // 1 quand le joueur a cliqué sur le dialogue
+} VictoryCinematic;
+
+// ── Dialogue Game Over avec Claude ──────────────────────────────────────────
+typedef struct {
+    int  active;     // 1 = dialogue en cours
+    int  done;       // 1 = joueur a cliqué, dialogue terminé
+    int  timer;      // timer d'animation de texte (typewriter)
+    int  char_shown; // nombre de caractères affichés
+} GameOverDialogue;
+
 // Rendu normal
 void initialisation_allegro(void);
 void init_display(Bitmaps *b, Assets *assets);
@@ -61,7 +86,7 @@ void destroy_display(Bitmaps *b, Assets *assets);
 void draw_bonus_system(BITMAP *buffer, Game *g, Assets *as);
 void draw_neon_circle(BITMAP *dest, int x, int y, int radius);
 
-// Cinématique
+// Cinématique inter-niveaux
 void transition_reset(Transition *tr);
 void transition_start(Transition *tr);
 int  transition_update(Transition *tr, Player *p, Game *game, Boss *boss,
@@ -69,5 +94,18 @@ int  transition_update(Transition *tr, Player *p, Game *game, Boss *boss,
 void display_transition(Transition *tr, Bitmaps *b, Assets *assets,
                         Player *p, Game *game, Etoile *etoiles, int n_etoiles);
 void transition_update_etoiles(Transition *tr, Etoile *etoiles, int n_etoiles);
+
+// Cinématique de victoire
+void victory_cinematic_reset(VictoryCinematic *vc);
+void victory_cinematic_start(VictoryCinematic *vc);
+int  victory_cinematic_update(VictoryCinematic *vc, Player *p, Boss *boss,
+                               Etoile *etoiles, int n_etoiles, float player_game_y);
+void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
+                            Player *p, Boss *boss, Etoile *etoiles, int n_etoiles);
+
+// Dialogue Game Over
+void gameover_dialogue_reset(GameOverDialogue *d);
+int  gameover_dialogue_update(GameOverDialogue *d);
+void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets, Player *p);
 
 #endif

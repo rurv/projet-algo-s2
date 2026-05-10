@@ -7,22 +7,31 @@
 
 #include "assets.h"
 
-#define BOSS_MAX_PV     100
+#define BOSS_MAX_PV      700
 #define BOSS_MAX_ECLAIRS 8
 
-// structure eclair du boss
+// Séquences de tir d'éclair disponibles
+typedef enum {
+    ECLAIR_SEQ_LONG,        // Un long tir continu
+    ECLAIR_SEQ_RAFALE,      // Enchainement de tirs courts en se déplaçant
+    ECLAIR_SEQ_PULSE,       // Tirs en pulses rapides
+    ECLAIR_SEQ_COUNT
+} EclairSequence;
+
+// Structure d'un éclair individuel
 typedef struct Eclair {
     float x, y;
     float dy;
     int active;
 } Eclair;
 
-// structure du boss
+// Structure du boss
 typedef struct Boss {
-    float x, y; // position
-    float dx;   // vitesse
-    float ddx;  // acceleration
+    float x, y;         // position
+    float dx;           // vitesse
+    float ddx;          // accélération
     float pv;
+    float pv_max;
     int active;
     int warning;
     int warning_timer;
@@ -37,14 +46,31 @@ typedef struct Boss {
     int exp_timer;
     int eclair_timer;
     int eclair_active;
+
+    // Séquences d'éclair diversifiées
+    EclairSequence current_seq;
+    int seq_timer;
+    int seq_phase;      // phase interne de la séquence
+    int seq_pulse_on;   // état on/off pour les pulses
+
+    // Cinématique de victoire (tremblement + explosions)
+    int dying;          // 1 = séquence de mort en cours
+    int die_timer;      // timer global de la séquence de mort
+    float shake_x;      // décalage de tremblement
+    int exp_mini_timer; // timer entre les mini-explosions
+    int exp_mini_frame; // frame de la mini-explosion courante
+    int exp_mini_active;
+    float exp_mini_x;   // position de la mini-explosion
+    float exp_mini_y;
+    int death_done;     // 1 quand la séquence de mort est terminée
 } Boss;
 
-void boss_init(Boss *b);                    // initialisation du boss
-void boss_move_right (Boss *b);             // mouvement vers la droite
-void boss_move_left (Boss *b);              // mouvement vers la gauche
-void boss_update(Boss *b);                  // mise à jour du boss
-void boss_shoot(Boss *b);                   // tir du boss
-void boss_draw(BITMAP *buffer, Boss *b);    // affichage du boss
-void boss_destroy(Boss *b);                 // animation de destruction du boss
+void boss_init(Boss *b);
+void boss_move_right(Boss *b);
+void boss_move_left(Boss *b);
+void boss_update(Boss *b);
+void boss_shoot(Boss *b);
+void boss_draw(BITMAP *buffer, Boss *b);
+void boss_destroy(Boss *b);
 
 #endif //PROJET_ALGO_S2_BOSS_H

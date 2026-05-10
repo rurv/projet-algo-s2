@@ -4,13 +4,28 @@
 #include "config.h"
 #include "assets.h"
 #include <allegro.h>
-#include "display.h"   // fournit Bitmaps, Etoile, Transition, etc.
+#include "display.h"
 #include "player.h"
 
-enum EcranActuel { MENU_PRINCIPAL, SAISIE_PSEUDO, REGLE, DECOMPTE, CHOIX, JEU, REPRENDRE, QUITTER, GAME_OVER, SAUVEGARDE, PAUSE };
-enum DiferrentDecompte {DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN};
+enum EcranActuel {
+    MENU_PRINCIPAL,
+    SAISIE_PSEUDO,
+    REGLE,
+    DECOMPTE,
+    CHOIX,
+    JEU,
+    REPRENDRE,
+    QUITTER,
+    GAME_OVER,
+    SAUVEGARDE,
+    PAUSE,
+    VICTOIRE,           // écran de victoire finale
+    VICTOIRE_CINEMA,    // cinématique de victoire (gérée dans main)
+};
 
-#define LX(p) ((int)(SCREEN_WIDTH * (p)))
+enum DiferrentDecompte { DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN };
+
+#define LX(p) ((int)(SCREEN_WIDTH  * (p)))
 #define LY(p) ((int)(SCREEN_HEIGHT * (p)))
 
 #define VAISSEAU_L 0.03
@@ -22,8 +37,6 @@ enum DiferrentDecompte {DECOMPTE1, DECOMPTE2, DECOMPTE3, DECOMPTEY, DECOMPTEN};
 #define NOMBRE_ETOILES 150
 
 #define ATTENDRE_RELACHE() do { while (mouse_b & 1) rest(10); } while(0)
-
-// Etoile est maintenant définie dans display.h — plus besoin de la redéfinir ici.
 
 typedef struct {
     int hauteur, longueure;
@@ -44,6 +57,8 @@ enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
 enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
 enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer);
-enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p);
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p,
+                                  GameOverDialogue *dialogue, Assets *assets);
+enum EcranActuel victory_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 
 #endif //PROJET_ALGO_S2_MENU_H
