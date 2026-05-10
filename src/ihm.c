@@ -373,10 +373,10 @@ enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer) {
     return ecran;
 }
 
-enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p, GameOverDialogue *dialogue, Assets *assets) {
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p, GameOverDialogue *dialogue, Assets *assets, Audio *audio) {
     // Show dialogue first, then the game over screen once it's done
     if (!dialogue->done) {
-        gameover_dialogue_draw(buffer, dialogue, assets, p);
+        gameover_dialogue_draw(buffer, dialogue, assets, p, audio);
         gameover_dialogue_update(dialogue);
         return ecran;
     }

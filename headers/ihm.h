@@ -58,8 +58,7 @@ enum EcranActuel regles(enum EcranActuel ecran, BITMAP *buffer);
 enum EcranActuel choix(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p);
 enum EcranActuel decompte(enum EcranActuel ecran, BITMAP *buffer, Assets *assets, Player *p, Audio *audio);
 enum EcranActuel pause_level(enum EcranActuel ecran, BITMAP *buffer);
-enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p,
-                                  GameOverDialogue *dialogue, Assets *assets);
+enum EcranActuel game_over_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p, GameOverDialogue *dialogue, Assets *assets, Audio *audio);
 enum EcranActuel victory_screen(enum EcranActuel ecran, BITMAP *buffer, Player *p);
 
 #endif //PROJET_ALGO_S2_MENU_H

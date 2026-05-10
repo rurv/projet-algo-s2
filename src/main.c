@@ -258,8 +258,7 @@ int main() {
                 break;
 
             case GAME_OVER:
-                ecran = game_over_screen(ecran, bmps.buffer, &player,
-                                         &go_dialogue, &assets);
+                ecran = game_over_screen(ecran, bmps.buffer, &player, &go_dialogue, &assets, &audio);
                 if (ecran == CHOIX) {
                     // Réinitialisation complète
                     player_init(&player);

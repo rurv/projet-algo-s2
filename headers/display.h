@@ -68,12 +68,13 @@ typedef struct {
     int  dialogue_done;     // 1 quand le joueur a cliqué sur le dialogue
 } VictoryCinematic;
 
-// ── Dialogue Game Over avec Claude ──────────────────────────────────────────
 typedef struct {
-    int  active;     // 1 = dialogue en cours
-    int  done;       // 1 = joueur a cliqué, dialogue terminé
-    int  timer;      // timer d'animation de texte (typewriter)
-    int  char_shown; // nombre de caractères affichés
+    int  active;
+    int  done;
+    int  timer;
+    int  char_shown;
+    int  phase;        // phase du dialogue (comme DiferrentDecompte)
+    int  premier_affichage;
 } GameOverDialogue;
 
 // Rendu normal
@@ -106,6 +107,6 @@ void victory_cinematic_draw(VictoryCinematic *vc, Bitmaps *b, Assets *assets,
 // Dialogue Game Over
 void gameover_dialogue_reset(GameOverDialogue *d);
 int  gameover_dialogue_update(GameOverDialogue *d);
-void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets, Player *p);
+void gameover_dialogue_draw(BITMAP *buffer, GameOverDialogue *d, Assets *assets, Player *p, Audio *audio);
 
 #endif
