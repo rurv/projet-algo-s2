@@ -1,7 +1,7 @@
 # projet-algo-s2
 # 🚀 Orbital Breaker: Claude's Last Mission
 
-> A shoot'em up game developed in C with Allegro 4.4 — ECE Paris, Semester 2 Algorithmique & Programmation project (Promotion 2027).
+> A shoot'em up game developed in C with Allegro 4.4 — ECE Paris, Semester 2 Algorithmique & Programmation project.
 
 ---
 
